@@ -1,13 +1,13 @@
-// YourComponent.jsx
+// LoginPage.jsx
 // import React from 'react';
 
-const YourComponent = () => {
+const LoginPage = () => {
   return (
-    <div>
-      <h1>Hello World</h1>
+    <div className="bg-purple-700">
+      <h1 className="text-red-400">Hello World</h1>
     </div>
   );
 };
 
-export default YourComponent;
+export default LoginPage;
 
