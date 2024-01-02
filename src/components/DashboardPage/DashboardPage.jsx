@@ -1,10 +1,12 @@
 // import React from "react";
+import Navbar from "./Navbar";
+import "./DashboardPage.css"
 
 const DashboardPage = () => {
   return (
-    <div>
-      <h1 className="text-white">Dashboard Page</h1>
-    </div>
+    <>
+    <Navbar />
+    </>
   );
 };
 

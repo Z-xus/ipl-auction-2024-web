@@ -39,7 +39,6 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
-  display: flex;
   min-width: 320px;
   min-height: 100vh;
 }
