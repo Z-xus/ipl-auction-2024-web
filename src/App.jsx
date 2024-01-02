@@ -1,13 +1,14 @@
 // import './App.css'
-import LoginPage from './components/LoginPage/LoginPage';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { DashboardPage, LoginPage } from './components';
 
-function App() {
-
+export default function App() {
   return (
-    <>
-      <LoginPage /> 
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<LoginPage />} />
+        <Route path='/dashboard' element={<DashboardPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
-
-export default App
