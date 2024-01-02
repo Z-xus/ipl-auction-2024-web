@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 /* Saving for later. */
+
+* {
+  margin: 0;
+  padding: 0;
+
+}
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -25,16 +32,19 @@ a {
 a:hover {
   color: #535bf2;
 }
+ */
 
 body {
-  margin: 0;
+  background-image: url('./images/bg.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
   display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
-h1 {
+/* h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
