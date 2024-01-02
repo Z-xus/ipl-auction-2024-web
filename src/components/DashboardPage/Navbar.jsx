@@ -1,21 +1,42 @@
 // import React from "react";
-import "./Navbar.css"
+import PropTypes from 'prop-types';
+import "./Navbar.css";
+
+const NavRoute = (props) => {
+  return (
+    <div className="nav-text">
+      <button>
+        <img src={"./images/icons/" + props.iconurl + ".png"} alt={props.text + " icon"} />
+        <p>{props.text}</p>
+      </button>
+    </div>
+  );
+};
+
+NavRoute.propTypes = {
+  url: PropTypes.string.isRequired,
+  iconurl: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired
+};
 
 const Navbar = () => {
   return (
-  <div className="nav-container">
+    <div className="nav-container">
 
       <div className="logo-container">
-        <div className="logo-text">IPL Auction 2024</div>
+        <div className="logo-text">
+          <img src="./images/icons/ipl.png" alt="Batsman Icon" />
+          <p>IPL Auction 2024</p>
+        </div>
       </div>
 
       <div className="route-container">
-        <div className="nav-text">Dashboard</div>
-        <div className="nav-text">Search</div>
-        <div className="nav-text">Leaderboard</div>
-        <div className="nav-text">Calculator</div>
-        <div className="nav-text">Spectate</div>
-        <div className="nav-text">Logout</div>
+        <NavRoute url="dashboard" iconurl="dashboard" text="Dashboard" />
+        <NavRoute url="search" iconurl="search" text="Search" />
+        <NavRoute url="leaderboard" iconurl="leaderboard" text="Leaderboard" />
+        <NavRoute url="calculator" iconurl="calculator" text="Calculator" />
+        <NavRoute url="spectate" iconurl="spectate" text="Spectate" />
+        <NavRoute url="logout" iconurl="logout" text="Logout" />
       </div>
 
     </div>
