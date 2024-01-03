@@ -4,12 +4,10 @@ import "./Navbar.css";
 
 const NavRoute = (props) => {
   return (
-    <div className="nav-text">
-      <button>
-        <img src={"./images/icons/" + props.iconurl + ".png"} alt={props.text + " icon"} />
-        <p>{props.text}</p>
-      </button>
-    </div>
+    <button className="nav-content">
+      <img src={`./images/icons/${props.iconurl}.png`} alt={`${props.text} icon`} />
+      <p>{props.text}</p>
+    </button>
   );
 };
 
@@ -24,7 +22,7 @@ const Navbar = () => {
     <div className="nav-container">
 
       <div className="logo-container">
-        <div className="logo-text">
+        <div className="logo-content">
           <img src="./images/icons/ipl.png" alt="Batsman Icon" />
           <p>IPL Auction 2024</p>
         </div>
