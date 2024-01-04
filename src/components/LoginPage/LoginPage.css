@@ -1,0 +1,14 @@
+.main {
+    background-image: url("./assets/main_background.png");
+    object-fit: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100vh;
+  
+  }
+
+.login{
+  background-image: url("./assets/login_background.png");
+}
+  
