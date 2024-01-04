@@ -16,19 +16,19 @@ const DashboardPage = () => {
         <Navbar />
       </nav>
 
-      <div className="team-container">
-        <div className="team-info">
-          <img className="team-logo" src={`./images/teamlogo/${dummyTeam.logo}.png`} alt="" />
-          <p className="budget-text">CURRENT BUDGET</p>
-          <p className="budget-price">{dummyTeam.budget}</p>
+      <div className="team-container flex-col px-4">
+        <div className="flex flex-col items-center">
+          <img className="w-3/5" src={`./images/teamlogo/${dummyTeam.logo}.png`} alt="" />
+          <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
+          <p className="budget-text text-[4rem] leading-[6rem]">{dummyTeam.budget}</p>
           <hr className="w-11/12" />
         </div>
 
-        <div className="powerup-container">
+        <div className="flex flex-col items-center">
           <p className="powercard-text">POWERCARDS</p>
           <div className="powerupcard-container">
             {dummyTeam.powerups.map((powerup, index) => {
-              return <img key={index} className="powerupcard" src={`./images/powercards/${powerup}.png`} alt={`${powerup} card`} />
+              return <img key={index} className="h-[6.6rem] m-2" src={`./images/powercards/${powerup}.png`} alt={`${powerup} card`} />
             })}
           </div>
         </div>
