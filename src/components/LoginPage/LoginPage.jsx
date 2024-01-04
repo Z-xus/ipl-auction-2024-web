@@ -22,3 +22,25 @@ const LoginPage = () => {
 
 export default LoginPage;
 
+/*
+   <div className="box">
+      <div className="group">
+        <div className="text-wrapper">Login</div>
+        <div className="overlap">
+          <div className="div">Sign in</div>
+        </div>
+        <div className="group-2">
+          <div className="overlap-group">
+            <div className="text-wrapper-2">username@gmail.com</div>
+          </div>
+          <div className="text-wrapper-3">Email</div>
+          <div className="overlap-group-2">
+            <div className="text-wrapper-4">Password</div>
+            <img className="clarity-eye-hide" alt="Clarity eye hide" src="clarity-eye-hide-line.svg" />
+          </div>
+          <div className="text-wrapper-5">Password</div>
+          <div className="text-wrapper-6">Forgot Password?</div>
+        </div>
+      </div>
+    </div>
+*/
