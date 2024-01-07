@@ -22,7 +22,7 @@ export const Card = ({ data }) => {
         <div
             draggable
             onDragStart={(e)=> handleOnDrag(e, 'Card')}
-            className='w-32 h-40 m-1 rounded bg-sky-900 flex flex-col justify-center cursor-pointer'>
+            className='w-32 h-40 m-1 rounded bg-sky-900 flex flex-col justify-center cursor-pointer select-none'>
             <h1 className="text-center py-2">{data.playerName}</h1>    
             <div className="flex flex-row justify-evenly">
                 <div className="flex flex-col text-center">

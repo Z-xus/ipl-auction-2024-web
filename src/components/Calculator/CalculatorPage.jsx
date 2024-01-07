@@ -2,7 +2,7 @@ import { useState } from 'react';
 import NavBar from "../Utils/Navbar"
 import "./style.css";
 import { RadioBox, CardContainer, Box, Card } from "./Utils.jsx";
-import  playerData  from "./assets/player";
+import playerData from "./assets/player";
 
 
 // dummy user.
@@ -12,20 +12,11 @@ const user = {
     avail_players: 5
 };
 
-// TODONEWS1: join <Card /> with the json data.
-// 2: take up the data from cards and add up to the total.
-// TODO0: Create drag and drop functionality using html5 api.
-// 0.1: create a state to carry information.
-// TODO1: Hold the card in the placeholder. 
-// TODO2: Add them into the user's total.
-// TODO3: Calculate the summation correctly using the user properties and selected options.
-
 const Calculator = () => {
 
-    const total_pts = 0;
-    // To save the cards which are dragged into placeholder.
+    const [points, setPoints] = useState(0);
     const [playerCards, setPlayerCards] = useState([]);
-
+    const [availablePlayers, setavailablePlayers] = useState(playerData);
 
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
@@ -36,14 +27,59 @@ const Calculator = () => {
         setSelectedRadioBox(boxId);
     };
 
+    // points is Nan when user drags before clicking on the required bat/bowl and ppl/mo/dth buttons.
+    const handleSetPoints = (change) => {
+        setPoints(points => points + change);
+    };
+
+    const getStatProperty = () => {
+
+        let prop = "";
+        if (selectedRadioBox === 1) prop += "bat"
+        else if (selectedRadioBox === 2) prop += "bow"
+
+        prop += "_";
+
+        if (selectedBox === 1) prop += "ppl";
+        else if (selectedBox === 2) prop += "mo";
+        else if (selectedBox === 3) prop += "dth";
+
+        return prop;
+    };
+
     const handleOnDrop = (e) => {
         let _data = e.dataTransfer.getData("Card");
-        console.log("type: ", _data);
-        console.log(playerCards);
+
+        if (selectedBox === null || selectedRadioBox === null) {
+            alert("Please select Bat/Bowl and Ppl/Mo/Dth."); // use a toast message for this.
+            e.preventDefault();
+            return;
+        }
+
         _data = JSON.parse(_data);
-        // TODO : extract the data and add to the total
-        setPlayerCards([...playerCards, _data]);
+
+        // Check if card already exists in the placeholder.
+        if (playerCards.some(data => {
+            if (data.playerName === _data.playerName) {
+                let selStat = data.selectedProp.substring(0, 3) + ' ' + data.selectedProp.substring(4);
+                alert(`Player already selected in stat ${selStat}`);
+                return true; // Player already exists
+            }
+            return false;
+        })) {
+            // Player already exists, no further action needed
+        } else {
+            // On Dropping the player, we need to remove it from the availablePlayers array.
+            let stat = getStatProperty();
+            handleSetPoints(_data[stat]);
+            _data.selectedProp = stat;
+            setavailablePlayers(prevPlayers => prevPlayers.filter(
+                player => player.playerName !== _data.playerName
+            ));
+            setPlayerCards([...playerCards, _data]);
+        }
     };
+
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -54,7 +90,7 @@ const Calculator = () => {
             <NavBar />
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">
-                    Total Points: {user.points}
+                    Total Points: {points}
                 </div>
                 <h1 className="font-bold uppercase underline text-4xl inline">Calculator</h1>
                 <div className="btns flex flex-row gap-3">
@@ -74,18 +110,18 @@ const Calculator = () => {
             <div className="card-placeholder h-40 flex justify-center items-center my-10"
                 onDrop={handleOnDrop} onDragOver={handleDragOver}
             >
-                {!playerCards.length && <span className="placeholder-text text-xl mx-4 flex gap-2">Drop your cards here!</span>}
+                {!playerCards.length && <span className="placeholder-text text-xl mx-4 flex">Drop your cards here!</span>}
                 {
-                    playerCards.map((data, index) => (
-                        // <div className="dropped" key={index}>
-                        //     {data.playerName}
-                        // </div>
-                        <Card key={index} data={data} style={{tansform : 'scale(0.9)'}} />
-                    ))
+                    playerCards.filter(data => data.selectedProp === getStatProperty())
+                        .map((data, index) => (
+                            // try making card a button.                    
+                            <Card key={index} data={data} />
+
+                        ))
                 }
             </div>
-            <CardContainer cardData={playerData} />
+            <CardContainer cardData={availablePlayers} />
         </div>
     );
-};
+    };
 export default Calculator;
