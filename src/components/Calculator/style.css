@@ -6,26 +6,53 @@
 .drag-in {
     background-image: url('./assets/medium-rect.svg');
     background-size: 100% 100%;
-    height: 200px;
-    width: 200px;
+    /* height: 200px; */
+    /* width: 245.73px; */
+    height: 150px;
+    width: 183.3px;
+
 }
-.total-points, .bat-btn , .ball-btn {
+
+.total-points,
+.bat-btn,
+.ball-btn {
     background-image: url('./assets/total-points.svg');
     background-size: 100% 100%;
 }
+
 .total-points {
     background-image: url('./assets/total-points-big.svg');
     background-size: 100% 100%;
+    /* height: 200px; */
+    /* width: 150px; */
 }
-.calculator {
-    background-image: url('./assets/bg-img.png');
+
+/* body  */
+.calculator 
+{
+    background-image: url('./assets/bg-img.png') !important;
     object-fit: cover;
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    height: 100vh;
+    padding-bottom: 50px;
+    /* height: 100vh; */
 }
+
 .card-placeholder {
     background-image: url('./assets/card-placeholder.svg');
     background-size: 100% 100%;
+}
+
+.highlight {
+    box-shadow: 0 0 10px 0 #00d7c3 inset, 0 0 20px 2px #00d7c3;
+    border-color: #00d7c3;
+    border-radius: 10px;
+}
+
+.highlight-btn {
+    border-radius: 6px !important;
+    box-shadow: 0 0 10px 0 #00d7c3 inset, 0 0 20px 2px #00d7c3;
+    border-color: #00d7c3;
+    background-size: initial;
 }
