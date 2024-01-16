@@ -4,7 +4,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 const powercards = [
   {
-    name: "focusfire",
+    name: "focus fire",
     desc: "Put a Player back in auction"
   },
   {

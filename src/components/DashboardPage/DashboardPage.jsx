@@ -1,4 +1,5 @@
 // import React from "react";
+import PropTypes from 'prop-types';
 import { Navbar } from "../Utils";
 import Powercard from "./Powercard";
 import "./DashboardPage.css"
@@ -12,7 +13,7 @@ const dummyTeam = {
   "score": 78,
   "players": [],
   "powercards": [
-    { name: "focusfire", isUsed: false },
+    { name: "focus fire", isUsed: false },
     { name: "double right to match", isUsed: true },
     { name: "god's eye", isUsed: true },
     { name: "right to match", isUsed: true },
@@ -41,9 +42,12 @@ function numberConvert(number) {
     return (sign * num).toString();
 }
 
-const DashboardPage = () => {
+const DashboardPage = ({ teamDetails }) => {
   // TODOs:
   // Implement Functionality
+
+  if (!teamDetails)
+    teamDetails = dummyTeam;
 
   return (
     <div className="dashboard-container">
@@ -53,16 +57,16 @@ const DashboardPage = () => {
 
       <div className="team-container flex-col px-4">
         <div className="flex flex-col items-center">
-          <img className="w-3/5" src={`/images/teamlogo/${dummyTeam.teamName.toLowerCase()}.png`} alt="" />
+          <img className="w-3/5" src={`/images/teamlogo/${teamDetails.teamName.toLowerCase()}.png`} alt="" />
           <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
-          <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(dummyTeam.budget)}</p>
+          <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(teamDetails.budget)}</p>
           <hr className="w-11/12" />
         </div>
 
         <div className="flex flex-col items-center">
           <p className="powercard-text">POWERCARDS</p>
           <div className="powerupcard-container">
-            {dummyTeam.powercards.map((pc, index) => {
+            {teamDetails.powercards.map((pc, index) => {
               return <Powercard key={index} name={pc.name} isUsed={pc.isUsed} />
             })}
           </div>
@@ -72,6 +76,10 @@ const DashboardPage = () => {
       <div className="team-players-container">Main Content Template</div>
     </div>
   );
+};
+
+DashboardPage.propTypes = {
+  teamDetails: PropTypes.object
 };
 
 export default DashboardPage;
