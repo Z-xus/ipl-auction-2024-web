@@ -35,7 +35,7 @@ const Powercard = ({ name, isUsed }) => {
   return (
     <Tooltip title={<p className="text-sm">{powercard.desc}</p>} arrow followCursor>
       <img className="h-[6.6rem] m-2 cursor-pointer"
-        src={`./images/powercards/${powercard.name}.png`}
+        src={`/images/powercards/${powercard.name}.png`}
         alt={`${powercard.name} card`}
         style={isUsed ? { 'filter': 'grayscale(100%)' } : {}} />
     </Tooltip>

@@ -42,6 +42,9 @@ function numberConvert(number) {
 }
 
 const DashboardPage = () => {
+  // TODOs:
+  // Implement Functionality
+
   return (
     <div className="dashboard-container">
       <nav className="col-span-2">
@@ -50,7 +53,7 @@ const DashboardPage = () => {
 
       <div className="team-container flex-col px-4">
         <div className="flex flex-col items-center">
-          <img className="w-3/5" src={`./images/teamlogo/${dummyTeam.teamName.toLowerCase()}.png`} alt="" />
+          <img className="w-3/5" src={`/images/teamlogo/${dummyTeam.teamName.toLowerCase()}.png`} alt="" />
           <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
           <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(dummyTeam.budget)}</p>
           <hr className="w-11/12" />

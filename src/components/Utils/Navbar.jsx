@@ -9,7 +9,7 @@ const NavRoute = ({ url, text }) => {
   return (
     <Link to={`/${url}`}>
       <div className="nav-content">
-        <img className="mr-0.5" src={`./images/icons/${url}.png`} alt={`${text} icon`} />
+        <img className="mr-0.5" src={`/images/icons/${url}.png`} alt={`${text} icon`} />
         <p>{text}</p>
       </div>
     </Link>
@@ -52,7 +52,7 @@ const Navbar = () => {
 
       <div className="logo-container justify-center">
         <div className="logo-content">
-          <img src="./images/icons/ipl.png" alt="Batsman Icon" />
+          <img src="/images/icons/ipl.png" alt="Batsman Icon" />
           <p>IPL Auction 2024</p>
         </div>
       </div>
@@ -64,7 +64,7 @@ const Navbar = () => {
         <NavRoute url="leaderboard" text="Leaderboard" />
         <NavRoute url="calculator" text="Calculator" />
         <button className="nav-content" onClick={() => setDrawerOpen(true)}>
-          <img className="mr-0.5" src={`./images/icons/spectate.png`} alt={`Spectate icon`} />
+          <img className="mr-0.5" src={`/images/icons/spectate.png`} alt={`Spectate icon`} />
           <p>Spectate</p>
         </button>
         <NavRoute url="logout" text="Logout" />
@@ -80,10 +80,10 @@ const Navbar = () => {
         <div className="sidebar">
 
           <div className="spectate-content justify-around">
-            <img src={`./images/icons/spectate.png`} alt={`Spectate icon`} />
+            <img src={`/images/icons/spectate.png`} alt={`Spectate icon`} />
             <p>Spectate Teams</p>
             <button onClick={() => setDrawerOpen(false)}>
-              <img src={`./images/icons/close.png`} alt={`Close Button`} />
+              <img src={`/images/icons/close.png`} alt={`Close Button`} />
             </button>
           </div>
 
@@ -91,7 +91,7 @@ const Navbar = () => {
             <SidebarItem
               key={abbrv}
               url={`/spectate/${abbrv}`}
-              logo={`./images/teamlogo/${abbrv}.png`}
+              logo={`/images/teamlogo/${abbrv}.png`}
               abbrv={abbrv}
             />
           ))}
