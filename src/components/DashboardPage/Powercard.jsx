@@ -5,7 +5,7 @@ import Tooltip from '@mui/material/Tooltip';
 const powercards = [
   {
     name: "focusfire",
-    desc: "Put a Player back in auction and get back the amount you paid for the player."
+    desc: "Put a Player back in auction"
   },
   {
     name: "double right to match",
@@ -21,7 +21,7 @@ const powercards = [
   },
   {
     name: "silent reserve",
-    desc: "You can secretly reserve two players during the initial stages of an IPL auction. This information will remain secret. "
+    desc: "Secretly reserve two players"
   },
   {
     name: "stealth bid",
@@ -33,7 +33,7 @@ const Powercard = ({ name, isUsed }) => {
   const powercard = powercards.find(pc => pc.name.toLowerCase() === name.toLowerCase())
 
   return (
-    <Tooltip title={powercard.desc} arrow followCursor>
+    <Tooltip title={<p className="text-sm">{powercard.desc}</p>} arrow followCursor>
       <img className="h-[6.6rem] m-2 cursor-pointer"
         src={`./images/powercards/${powercard.name}.png`}
         alt={`${powercard.name} card`}

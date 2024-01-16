@@ -1,19 +1,21 @@
 // import React from "react";
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import "./Navbar.css";
 
-const NavRoute = (props) => {
+const NavRoute = ({ url, text }) => {
   return (
-    <button className="nav-content">
-      <img src={`./images/icons/${props.url}.png`} alt={`${props.text} icon`} />
-      <p>{props.text}</p>
-    </button>
+    <Link to={`/${url}`}>
+      <button className="nav-content">
+        <img src={`./images/icons/${url}.png`} alt={`${text} icon`} />
+        <p>{text}</p>
+      </button>
+    </Link>
   );
 };
 
 NavRoute.propTypes = {
   url: PropTypes.string.isRequired,
-  iconurl: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired
 };
 
