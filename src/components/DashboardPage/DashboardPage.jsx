@@ -1,7 +1,6 @@
 // import React from "react";
 import PropTypes from 'prop-types';
-import { Navbar } from "../Utils";
-import Powercard from "./Powercard";
+import { Navbar, Powercard } from "../Utils";
 import "./DashboardPage.css"
 
 const dummyTeam = {
@@ -51,11 +50,14 @@ const DashboardPage = ({ teamDetails }) => {
 
   return (
     <div className="dashboard-container">
+      {/* Navbar */}
       <nav className="col-span-2">
         <Navbar />
       </nav>
 
+      {/* Team Data */}
       <div className="team-container flex-col px-4">
+        {/* Budget Info */}
         <div className="flex flex-col items-center">
           <img className="w-3/5" src={`/images/teamlogo/${teamDetails.teamName.toLowerCase()}.png`} alt="" />
           <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
@@ -63,16 +65,16 @@ const DashboardPage = ({ teamDetails }) => {
           <hr className="w-11/12" />
         </div>
 
+        {/* Powercard Info */}
         <div className="flex flex-col items-center">
           <p className="powercard-text">POWERCARDS</p>
           <div className="powerupcard-container">
-            {teamDetails.powercards.map((pc, index) => {
-              return <Powercard key={index} name={pc.name} isUsed={pc.isUsed} />
-            })}
+            {teamDetails.powercards.map((pc, index) => (<Powercard key={index} name={pc.name} isUsed={pc.isUsed} />))}
           </div>
         </div>
       </div>
 
+      {/* Team Players */}
       <div className="team-players-container">Main Content Template</div>
     </div>
   );
