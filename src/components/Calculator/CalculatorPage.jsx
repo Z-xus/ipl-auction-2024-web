@@ -1,16 +1,8 @@
 import { useState } from 'react';
 import NavBar from "../Utils/Navbar"
 import "./style.css";
-import { RadioBox, CardContainer, Box, Card } from "./Utils.jsx";
+import { RadioBox, CardContainer, Box, Button, Card, Popup } from "./Utils.jsx";
 import playerData from "./assets/player";
-
-
-// dummy user.
-const user = {
-    points: 144,
-    no_of_cards: 0,
-    avail_players: 5
-};
 
 const Calculator = () => {
 
@@ -20,6 +12,7 @@ const Calculator = () => {
 
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
+
     const handleBoxSelect = (boxId) => {
         setSelectedBox(boxId);
     };
@@ -75,31 +68,55 @@ const Calculator = () => {
             _data.selectedProp = stat;
             setavailablePlayers(prevPlayers => prevPlayers.filter(
                 player => player.playerName !== _data.playerName
-            ));
+            ))
             setPlayerCards([...playerCards, _data]);
         }
     };
 
+    const handleClearCards = () => {
+        // clears all cards.
+        // remove all cards from playerCards[] and put all into availablePlayers[]
+        setavailablePlayers((prevPlayers) => [...prevPlayers, ...playerCards]);
+        setPlayerCards([]);
+
+    };
+
+    const handleSubmit = () => {
+        // make a popup confirmation.
+        // submit the total pts to api.
+        handleShowPopup();
+    };
 
     const handleDragOver = (e) => {
         e.preventDefault();
     };
 
+    // Popup logic.
+    const [showPopup, setShowPopup] = useState(false);
+    const handleShowPopup = () => {
+        setShowPopup(true);
+    };
+    const handleClosePopup = () => {
+        setShowPopup(false);
+    };
+
+
     return (
         <div className="calculator">
             <NavBar />
+            {showPopup && <Popup message={`Are you sure? Your total points are ${points}`} onClose={handleClosePopup} />}
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">
                     Total Points: {points}
                 </div>
-                <h1 className="font-bold uppercase underline text-4xl inline">Calculator</h1>
+                {
+                // <h1 className="font-bold uppercase underline text-4xl inline">Calculator</h1>
+                }
                 <div className="btns flex flex-row gap-3">
-                    {
-                        // <button className="btn py-4 px-6 text-2xl rounded bat-btn">Bat</button>
-                        // <button className="btn py-4 px-6 text-2xl rounded ball-btn">Ball</button>
-                    }
                     <RadioBox id={1} label="Bat" isSelected={selectedRadioBox === 1} onSelect={handleRadioBoxSelect} />
                     <RadioBox id={2} label="Bowl" isSelected={selectedRadioBox === 2} onSelect={handleRadioBoxSelect} />
+                    <Button text={"Clear"} event={handleClearCards} />
+                    <Button text={"Submit"} event={handleSubmit} />
                 </div>
             </div>
             <div className="drag-in-container flex justify-evenly">
@@ -114,14 +131,12 @@ const Calculator = () => {
                 {
                     playerCards.filter(data => data.selectedProp === getStatProperty())
                         .map((data, index) => (
-                            // try making card a button.                    
                             <Card key={index} data={data} />
-
                         ))
                 }
             </div>
             <CardContainer cardData={availablePlayers} />
         </div>
     );
-    };
+};
 export default Calculator;

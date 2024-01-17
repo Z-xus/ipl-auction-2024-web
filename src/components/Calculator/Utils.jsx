@@ -1,4 +1,3 @@
-
 export const Box = ({ id, label, isSelected, onSelect, children }) => {
     const handleClick = () => {
         onSelect(id);
@@ -21,9 +20,9 @@ export const Card = ({ data }) => {
     return (
         <div
             draggable
-            onDragStart={(e)=> handleOnDrag(e, 'Card')}
+            onDragStart={(e) => handleOnDrag(e, 'Card')}
             className='w-32 h-40 m-1 rounded bg-sky-900 flex flex-col justify-center cursor-pointer select-none'>
-            <h1 className="text-center py-2">{data.playerName}</h1>    
+            <h1 className="text-center py-2">{data.playerName}</h1>
             <div className="flex flex-row justify-evenly">
                 <div className="flex flex-col text-center">
                     <span>Bat</span>
@@ -66,4 +65,31 @@ export const RadioBox = ({ id, label, isSelected, onSelect }) => {
             {label}
         </div>
     );
+};
+
+export const Button = ({ text , event }) => {
+    const handleClick = () => {
+       event();
+    };
+    return (
+        <div className={`w-28 cursor-pointer btn m-0 py-4 px-6 rounded bat-btn text-center text-2xl`} onClick={handleClick}>
+            {text}
+        </div>
+    );
+};
+
+export const Popup = ({ message, onClose }) => {
+  return (
+    <>
+      <div className="fixed top-0 left-0 w-full h-full bg-gray-800 opacity-50 z-40"></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-sky-900 p-8 shadow-md z-50 rounded-lg">
+        <div className="flex flex-col items-center">
+          <p className="text-white text-2xl">{message}</p>
+          <button onClick={onClose} className="mt-4 px-4 py-2 rounded bg-gray-100 text-sky-700 hover:bg-gray-200 border-none cursor-pointer">
+            Close
+          </button>
+        </div>
+      </div>
+    </>
+  );
 };
