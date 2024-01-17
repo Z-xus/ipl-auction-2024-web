@@ -1,24 +1,21 @@
 // import React from "react";
 import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Drawer from '@mui/material/Drawer';
 import "./Navbar.css";
 
-const NavRoute = ({ url, text }) => {
-  return (
-    <Link to={`/${url}`}>
-      <div className="nav-content">
-        <img className="mr-0.5" src={`/images/icons/${url}.png`} alt={`${text} icon`} />
-        <p>{text}</p>
-      </div>
-    </Link>
-  );
-};
+const NavButton = ({ url, text, onClick }) => (
+  <div className="nav-content cursor-pointer" onClick={onClick}>
+    <img className="mr-0.5" src={`/images/icons/${url}.png`} alt={`${text} icon`} />
+    <p>{text}</p>
+  </div>
+);
 
-NavRoute.propTypes = {
+NavButton.propTypes = {
   url: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired
+  text: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired
 };
 
 const SidebarItem = ({ url, logo, abbrv }) => (
@@ -41,11 +38,19 @@ const Navbar = () => {
     rcb: "Royal Challengers Bangalore", rr: "Rajasthan Royals", srh: "Sunrisers Hyderabad"
   };
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const navigate = useNavigate()
 
   // TODO
-  // Add Animations
   // Grey out Leaderboard Button until allowed
   // Redirect to Dashboard if own team is selected in spectate
+
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      localStorage.clear();
+      navigate('/');
+    }
+  };
 
   return (
     <div className="nav-container">
@@ -59,15 +64,12 @@ const Navbar = () => {
 
       {/* All Nav Buttons */}
       <div className="route-container justify-between">
-        <NavRoute url="dashboard" text="Dashboard" />
-        <NavRoute url="search" text="Search" />
-        <NavRoute url="leaderboard" text="Leaderboard" />
-        <NavRoute url="calculator" text="Calculator" />
-        <button className="nav-content" onClick={() => setDrawerOpen(true)}>
-          <img className="mr-0.5" src={`/images/icons/spectate.png`} alt={`Spectate icon`} />
-          <p>Spectate</p>
-        </button>
-        <NavRoute url="logout" text="Logout" />
+        <NavButton url="dashboard" text="Dashboard" onClick={() => navigate('/dashboard')} />
+        <NavButton url="search" text="Search" onClick={() => navigate('/search')} />
+        <NavButton url="leaderboard" text="Leaderboard" onClick={() => navigate('/leaderboard')} />
+        <NavButton url="calculator" text="Calculator" onClick={() => navigate('/calculator')} />
+        <NavButton url="spectate" text="Spectate" onClick={() => setDrawerOpen(true)} />
+        <NavButton url="logout" text="Logout" onClick={() => handleLogout()} />
       </div>
 
       {/* Sidebar */}
