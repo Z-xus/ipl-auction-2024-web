@@ -4,7 +4,7 @@ import "./style.css";
 import { RadioBox, CardContainer, Box, Button, Card, Popup } from "./Utils.jsx";
 import playerData from "./assets/player";
 
-const Calculator = () => {
+const CalculatorPage = () => {
 
     const [points, setPoints] = useState(0);
     const [playerCards, setPlayerCards] = useState([]);
@@ -139,4 +139,4 @@ const Calculator = () => {
         </div>
     );
 };
-export default Calculator;
+export default CalculatorPage;
