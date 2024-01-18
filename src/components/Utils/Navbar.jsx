@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Drawer from '@mui/material/Drawer';
+import Popup from "./Popup";
 import "./Navbar.css";
 
 const NavButton = ({ url, text, onClick }) => (
@@ -37,71 +38,86 @@ const Navbar = () => {
     kkr: "Kolkata Knight Riders", lsg: "Lucknow Supergiants", mi: "Mumbai Indians", pbks: "Punjab Kings",
     rcb: "Royal Challengers Bangalore", rr: "Rajasthan Royals", srh: "Sunrisers Hyderabad"
   };
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate()
 
   // TODO
   // Grey out Leaderboard Button until allowed
   // Redirect to Dashboard if own team is selected in spectate
 
+  // Popup Logic
+  const [showPopup, setShowPopup] = useState(false);
+  const handleShowPopup = () => { setShowPopup(true) };
+  const handleClosePopup = () => { setShowPopup(false) };
+
+  // Drawer Logic
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const handleShowDrawer = () => { setDrawerOpen(true) };
+  const handleCloseDrawer = () => { setDrawerOpen(false) };
+
   const handleLogout = () => {
-    const confirmLogout = window.confirm("Are you sure you want to logout?");
-    if (confirmLogout) {
-      localStorage.clear();
-      navigate('/');
-    }
+    handleShowPopup();
+  };
+
+  const performLogout = () => {
+    localStorage.clear();
+    navigate('/');
   };
 
   return (
-    <div className="nav-container">
+    <>
+      {showPopup && <Popup message="Are you sure you want to logout?" onCancel={handleClosePopup} onConfirm={performLogout} />}
 
-      <div className="logo-container justify-center">
-        <div className="logo-content">
-          <img src="/images/icons/ipl.png" alt="Batsman Icon" />
-          <p>IPL Auction 2024</p>
+      <div className="nav-container">
+
+        {/* IPL Logo */}
+        <div className="logo-container justify-center">
+          <div className="logo-content">
+            <img src="/images/icons/ipl.png" alt="Batsman Icon" />
+            <p>IPL Auction 2024</p>
+          </div>
         </div>
-      </div>
 
-      {/* All Nav Buttons */}
-      <div className="route-container justify-between">
-        <NavButton url="dashboard" text="Dashboard" onClick={() => navigate('/dashboard')} />
-        <NavButton url="search" text="Search" onClick={() => navigate('/search')} />
-        <NavButton url="leaderboard" text="Leaderboard" onClick={() => navigate('/leaderboard')} />
-        <NavButton url="calculator" text="Calculator" onClick={() => navigate('/calculator')} />
-        <NavButton url="spectate" text="Spectate" onClick={() => setDrawerOpen(true)} />
-        <NavButton url="logout" text="Logout" onClick={() => handleLogout()} />
-      </div>
+        {/* All Nav Buttons */}
+        <div className="route-container justify-between">
+          <NavButton url="dashboard" text="Dashboard" onClick={() => navigate('/dashboard')} />
+          <NavButton url="search" text="Search" onClick={() => navigate('/search')} />
+          <NavButton url="leaderboard" text="Leaderboard" onClick={() => navigate('/leaderboard')} />
+          <NavButton url="calculator" text="Calculator" onClick={() => navigate('/calculator')} />
+          <NavButton url="spectate" text="Spectate" onClick={handleShowDrawer} />
+          <NavButton url="logout" text="Logout" onClick={() => handleLogout()} />
+        </div>
 
-      {/* Sidebar */}
-      <Drawer sx={{
-        '.MuiDrawer-paper': { backgroundColor: 'transparent', },
-        '& .MuiBackdrop-root': { backdropFilter: 'blur(5px)', },
-      }}
-        anchor="left" open={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
+        {/* Sidebar */}
+        <Drawer sx={{
+          '.MuiDrawer-paper': { backgroundColor: 'transparent', },
+          '& .MuiBackdrop-root': { backdropFilter: 'blur(5px)', },
+        }}
+          anchor="left" open={isDrawerOpen} onClose={handleCloseDrawer}>
 
-        <div className="sidebar">
+          <div className="sidebar">
 
-          <div className="spectate-content justify-around">
-            <img src={`/images/icons/spectate.png`} alt={`Spectate icon`} />
-            <p>Spectate Teams</p>
-            <button onClick={() => setDrawerOpen(false)}>
-              <img src={`/images/icons/close.png`} alt={`Close Button`} />
-            </button>
+            <div className="spectate-content justify-around">
+              <img src={`/images/icons/spectate.png`} alt={`Spectate icon`} />
+              <p>Spectate Teams</p>
+              <button onClick={handleCloseDrawer}>
+                <img src={`/images/icons/close.png`} alt={`Close Button`} />
+              </button>
+            </div>
+
+            {Object.entries(teams).map(([abbrv]) => (
+              <SidebarItem
+                key={abbrv}
+                url={`/spectate/${abbrv}`}
+                logo={`/images/teamlogo/${abbrv}.png`}
+                abbrv={abbrv}
+              />
+            ))}
+
           </div>
 
-          {Object.entries(teams).map(([abbrv]) => (
-            <SidebarItem
-              key={abbrv}
-              url={`/spectate/${abbrv}`}
-              logo={`/images/teamlogo/${abbrv}.png`}
-              abbrv={abbrv}
-            />
-          ))}
-
-        </div>
-
-      </Drawer>
-    </div>
+        </Drawer>
+      </div>
+    </>
   );
 };
 
