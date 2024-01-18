@@ -1,8 +1,9 @@
+// import React from 'react';
 import { useState } from 'react';
-import NavBar from "../Utils/Navbar"
-import "./style.css";
-import { RadioBox, CardContainer, Box, Button, Card, Popup } from "./Utils.jsx";
+import { Navbar, Popup } from "../Utils"
+import { RadioBox, CardContainer, Box, Button, Card } from "./Utils.jsx";
 import playerData from "./assets/player";
+import "./style.css";
 
 const CalculatorPage = () => {
 
@@ -83,7 +84,6 @@ const CalculatorPage = () => {
 
     const handleSubmit = () => {
         // make a popup confirmation.
-        // submit the total pts to api.
         handleShowPopup();
     };
 
@@ -103,8 +103,9 @@ const CalculatorPage = () => {
 
     return (
         <div className="calculator">
-            <NavBar />
-            {showPopup && <Popup message={`Are you sure? Your total points are ${points}`} onClose={handleClosePopup} />}
+            <Navbar />
+            {/* TODO: Submit total pts to api when user presses confirm btn */}
+            {showPopup && <Popup message={`Are you sure? Your total points are ${points}`} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">
                     Total Points: {points}
