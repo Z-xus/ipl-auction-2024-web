@@ -1,6 +1,9 @@
 // import React from "react";
 import PropTypes from 'prop-types';
 import { Navbar, Powercard } from "../Utils";
+// Need to clean this up
+import players from "../CalculatorPage/assets/player.json"
+import { Card } from "../CalculatorPage/Utils"
 import "./DashboardPage.css"
 
 const dummyTeam = {
@@ -27,26 +30,54 @@ const dummyTeam = {
  * @returns {string} The formatted string with suffix.
  */
 function numberConvert(number) {
-  let num = Number(number);
+  let num = Math.abs(Number(number));
   let sign = Math.sign(num);
-  num = Math.abs(num);
 
   if (num >= 1e7)
-    return sign * (num / 1e7).toFixed(1) + ' CR';
+    return `${sign * (num / 1e7).toFixed(1)} CR`;
   else if (num >= 1e5)
-    return sign * (num / 1e5).toFixed(1) + ' L';
+    return `${sign * (num / 1e5).toFixed(1)} L`;
   else if (num >= 1e3)
-    return sign * (num / 1e3).toFixed(1) + ' K';
+    return `${sign * (num / 1e3).toFixed(1)} K`;
   else
     return (sign * num).toString();
 }
 
+const TeamPlayers = ({ type, data }) => {
+  if (!data.find(player => player.type === type)) return;
+
+  return (
+    <div className='flex flex-col'>
+
+      <p className='powercard-text text-xl'>{type}</p>
+      <div className='flex flex-wrap items-center justify-evenly'>
+        {data.map(player => (
+          player.type === type &&
+          <div className="px-16 py-8" key={player.playerName}>
+            <Card data={player} />
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
+};
+
+TeamPlayers.propTypes = {
+  type: PropTypes.string.isRequired,
+  data: PropTypes.array.isRequired
+};
+
 const DashboardPage = ({ teamDetails }) => {
+  const playerTypes = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];
+
   // TODOs:
   // Implement Functionality
 
-  if (!teamDetails)
+  if (!teamDetails) {
     teamDetails = dummyTeam;
+    dummyTeam.players = players;
+  }
 
   return (
     <div className="dashboard-container">
@@ -69,13 +100,16 @@ const DashboardPage = ({ teamDetails }) => {
         <div className="flex flex-col items-center">
           <p className="powercard-text">POWERCARDS</p>
           <div className="powerupcard-container">
-            {teamDetails.powercards.map((pc, index) => (<Powercard key={index} name={pc.name} isUsed={pc.isUsed} />))}
+            {teamDetails.powercards.map(({ name, isUsed }, index) => (<Powercard key={index} name={name} isUsed={isUsed} />))}
           </div>
         </div>
       </div>
 
       {/* Team Players */}
-      <div className="team-players-container">Main Content Template</div>
+      <div className="overflow-y-auto m-1/12 p-2 bg-blue-500 bg-opacity-20 border-3 border-blue-500 border-opacity-50 rounded-lg shadow-md">
+        <p className='powercard-text text-2xl my-2'> CURRENT TEAM PLAYERS </p>
+        {playerTypes.map(type => (<TeamPlayers key={type} type={type} data={teamDetails.players} />))}
+      </div>
     </div>
   );
 };
