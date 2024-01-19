@@ -1,5 +1,6 @@
 import Navbar from './Navbar';
-import Powercard from './Powercard';
+import Card from './Card'
 import Popup from './Popup';
+import Powercard from './Powercard';
 
-export { Navbar, Powercard, Popup };
+export { Navbar, Card, Popup, Powercard };

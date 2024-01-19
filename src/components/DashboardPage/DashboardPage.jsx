@@ -1,9 +1,8 @@
-// import React from "react";
+// import React from 'react';
 import PropTypes from 'prop-types';
-import { Navbar, Powercard } from "../Utils";
+import { Navbar, Card, Powercard } from "../Utils";
 // Need to clean this up
 import players from "../CalculatorPage/assets/player.json"
-import { Card } from "../CalculatorPage/Utils"
 import "./DashboardPage.css"
 
 const dummyTeam = {
