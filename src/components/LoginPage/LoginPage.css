@@ -1,13 +1,3 @@
-@font-face {
-  src: local('Gilroy-Bold'), url(/fonts/Gilroy-Bold.ttf) format('truetype');
-  font-family: 'Gilroy-Bold';
-}
-
-@font-face {
-  src: local('Gilroy-Regular'), url(/fonts/Gilroy-Regular.ttf) format('truetype');
-  font-family: 'Gilroy-Normal';
-}
-
 .main,
 .login-container {
   display: flex;

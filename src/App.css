@@ -3,6 +3,26 @@
 @tailwind utilities;
 /* Saving for later. */
 
+@font-face {
+  src: local('Gilroy-Regular'), url(/fonts/Gilroy-Regular.ttf) format('truetype');
+  font-family: 'Gilroy-Normal';
+}
+
+@font-face {
+  src: local('Gilroy-Bold'), url(/fonts/Gilroy-Bold.ttf) format('truetype');
+  font-family: 'Gilroy-Bold';
+}
+
+@font-face {
+  src: local('DroidSans-Regular'), url(/fonts/DroidSans.ttf) format('truetype');
+  font-family: 'DroidSans-Normal';
+}
+
+@font-face {
+  src: local('DroidSans-Bold'), url(/fonts/DroidSans-Bold.ttf) format('truetype');
+  font-family: 'DroidSans-Bold';
+}
+
 * {
   margin: 0;
   padding: 0;
