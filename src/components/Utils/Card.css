@@ -5,131 +5,53 @@
   width: 10vw;
   height: 13vw;
   cursor: pointer;
+  border: .2rem solid gray;
   border-radius: 30px;
 }
 
-.card-front {
-}
-
+.card-front,
 .card-back {
-  border-radius: 1.5rem;
   align-items: stretch;
   background-image: url('/images/card_bg.jpg');
-  background-size: cover;
   background-repeat: no-repeat;
-}
-
-.stat-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  border-radius: .5rem;
-  background-color: white;
-  text-align: center;
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  padding: .5rem;
-  margin: .25rem .25rem 0 .25rem;
-}
-
-.stat-text {
-  color: #1B223E;
-  font-family: "DroidSans-Bold", Verdana, Geneva, Tahoma, sans-serif;
-  font-size: .9rem;
-}
-
-
-
-
-
-
-.player-img {
-  display: flex;
-  width: 100%;
-  height: 60%;
-}
-
-.frontPlayerImg {
-  display: flex;
-  width: 100%;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: center;
-  width: 90%;
-  height: 18%;
-  background-color: white;
-  border-radius: 30px 30px 30px 30px;
-  font-size: 1vw;
+  background-size: cover;
+  border-radius: 1.5rem;
 }
 
 .player-name {
+  font-size: 1.1rem;
+  font-family: 'Economica', Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: 700;
+  line-height: 1.4rem;
   color: #FFF;
   text-align: center;
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  font-family: 'Economica', Verdana, Geneva, Tahoma, sans-serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  line-height: 1.4rem;
 }
 
-.flag {
+.front-stat-container,
+.back-stat-container {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   display: flex;
-  align-items: center;
-  width: 50%;
-}
-
-.bat-ball {
-  display: flex;
-  align-items: center;
-  width: 50%;
-}
-
-.price {
-  display: flex;
-  align-items: center;
-  width: 85%;
-  font-size: 1.2vw;
-  font-weight: 700;
-  color: black;
-}
-
-.player-img img {
-  max-width: 100%;
-}
-
-.typeBtn {
-  width: calc(100%/3);
+  flex-direction: row;
+  justify-content: space-between;
   background-color: white;
-  cursor: pointer;
-  border: none;
-  border-top: 2px black solid;
-  font-size: 1vw;
+  border-radius: .5rem;
+  text-align: center;
 }
 
-.batStat,
-.bowlStat {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+.front-stat-container {
   align-items: center;
-  width: 48%;
-  height: 65%;
-  font-size: 1vw;
-  font-weight: 900;
-  color: whitesmoke;
-  text-shadow: 0px 2px 4px black;
+  padding: 0.25rem;
 }
 
-.player-back-stats {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 96%;
-  height: 20%;
-  font-size: 1.2vw;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0px 2px 4px black;
+.back-stat-container {
+  margin: .25rem .25rem 0 .25rem;
+  padding: .5rem;
+}
+
+.stat-text {
+  font-size: .9rem;
+  font-family: "DroidSans-Bold", Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: 700;
+  color: #1B223E;
 }

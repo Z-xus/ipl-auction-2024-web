@@ -3,7 +3,7 @@ import { useState } from "react";
 import ReactCardFlip from "react-card-flip";
 import CardFront from "./CardFront";
 import CardBack from "./CardBack";
-import './Card.css'
+import './Card.css';
 
 const Draggable = ({ onDragStart, onClick, children }) => (
   <div draggable onDragStart={onDragStart} onClick={onClick}>
@@ -26,9 +26,7 @@ const Card = ({ data }) => {
     <ReactCardFlip isFlipped={isFlipped}>
 
       <Draggable onDragStart={(e) => handleOnDrag(e, 'Card')} onClick={handleFlip}>
-        <div className='w-32 h-40 m-1 rounded bg-sky-900 flex flex-col justify-center cursor-pointer select-none'>
-          <CardFront playerData={data} />
-        </div>
+        <CardFront playerData={data} />
       </Draggable>
 
       <Draggable onDragStart={(e) => handleOnDrag(e, 'Card')} onClick={handleFlip}>
