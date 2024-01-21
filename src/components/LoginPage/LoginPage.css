@@ -8,7 +8,7 @@
 .main {
   min-width: 320px;
   min-height: 100vh;
-  background-image: url('/images/login_bg.png');
+  background-image: url('/images/background/login.png');
   background-repeat: no-repeat;
   background-position: bottom;
   background-size: cover;
@@ -31,6 +31,7 @@
   margin-bottom: 1rem;
   font-size: 1.875rem;
   font-family: Gilroy-Bold, Arial, Helvetica, sans-serif;
+  font-weight: 700;
   color: #FFF;
 }
 
@@ -42,6 +43,7 @@
   display: block;
   font-size: .9rem;
   font-family: Gilroy-Normal, Arial, Helvetica, sans-serif;
+  font-weight: 400;
   color: #FFF;
 }
 

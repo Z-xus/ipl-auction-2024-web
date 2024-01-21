@@ -12,7 +12,7 @@
 .card-front,
 .card-back {
   align-items: stretch;
-  background-image: url('/images/card_bg.jpg');
+  background-image: url('/images/background/card.png');
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 1.5rem;
