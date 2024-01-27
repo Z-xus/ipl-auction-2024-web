@@ -80,7 +80,6 @@ const Navbar = ({ style = {} }) => {
         {/* All Nav Buttons */}
         <div className="route-container justify-between">
           <NavButton url="dashboard" text="Dashboard" onClick={() => navigate('/dashboard')} />
-          <NavButton url="search" text="Search" onClick={() => navigate('/search')} />
           <NavButton url="leaderboard" text="Leaderboard" onClick={() => navigate('/leaderboard')} />
           <NavButton url="calculator" text="Calculator" onClick={() => navigate('/calculator')} />
           <NavButton url="spectate" text="Spectate" onClick={handleShowDrawer} />
