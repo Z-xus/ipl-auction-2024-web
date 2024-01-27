@@ -105,7 +105,7 @@ const DashboardPage = ({ teamDetails }) => {
       </div>
 
       {/* Team Players */}
-      <div className="overflow-y-auto m-1/12 p-2 bg-blue-500 bg-opacity-20 border-3 border-blue-500 border-opacity-50 rounded-lg shadow-md">
+      <div className="overflow-y-auto m-1/12 p-2 custom-scrollbar">
         <p className='powercard-text text-2xl my-2'> CURRENT TEAM PLAYERS </p>
         {playerTypes.map(type => (<TeamPlayers key={type} type={type} data={teamDetails.players} />))}
       </div>

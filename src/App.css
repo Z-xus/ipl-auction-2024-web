@@ -26,7 +26,6 @@
 * {
   margin: 0;
   padding: 0;
-
 }
 
 /* :root {
@@ -56,11 +55,28 @@ a:hover {
 
 body {
   background-image: url('/images/background/main.png');
-  background-size: cover;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: bottom;
   min-width: 320px;
   min-height: 100vh;
+}
+
+.custom-scrollbar {
+  scrollbar-width: 2rem;
+  scrollbar-color: rgba(88, 130, 193, 0.50) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 2rem;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: rgba(88, 130, 193, 0.50);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
 }
 
 /* h1 {

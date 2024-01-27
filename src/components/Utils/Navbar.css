@@ -53,6 +53,7 @@
 .sidebar {
   filter: drop-shadow(0 4px 25px rgba(0, 0, 0, 0.25));
   opacity: 0.75;
+  overflow-y: auto;
   margin: 0.25rem;
   padding: 1rem;
   background-color: rgba(88, 130, 193, 0.20);

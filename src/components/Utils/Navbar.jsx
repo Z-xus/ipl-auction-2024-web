@@ -32,7 +32,7 @@ SidebarItem.propTypes = {
   abbrv: PropTypes.string.isRequired,
 };
 
-const Navbar = () => {
+const Navbar = ({ style = {} }) => {
   const teams = {
     csk: "Chennai Super Kings", dc: "Delhi Capitals", gt: "Gujarat Titans",
     kkr: "Kolkata Knight Riders", lsg: "Lucknow Supergiants", mi: "Mumbai Indians", pbks: "Punjab Kings",
@@ -67,7 +67,7 @@ const Navbar = () => {
     <>
       {showPopup && <Popup message="Are you sure you want to logout?" onCancel={handleClosePopup} onConfirm={performLogout} />}
 
-      <div className="nav-container">
+      <div className="nav-container" style={style}>
 
         {/* IPL Logo */}
         <div className="logo-container justify-center">
@@ -94,7 +94,7 @@ const Navbar = () => {
         }}
           anchor="left" open={isDrawerOpen} onClose={handleCloseDrawer}>
 
-          <div className="sidebar">
+          <div className="sidebar custom-scrollbar">
 
             <div className="spectate-content justify-around">
               <img src={`/images/icons/spectate.png`} alt={`Spectate icon`} />
