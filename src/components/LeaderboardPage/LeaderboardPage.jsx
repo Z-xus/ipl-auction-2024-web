@@ -1,6 +1,6 @@
-import React from 'react';
-import './leaderboard.css'
+// import React from 'react';
 import { Navbar } from '../Utils'
+import './LeaderboardPage.css'
 
 const teamsData = [
     { name: 'Mumbai Indians', points: 20, position: 1 },
@@ -13,7 +13,7 @@ const teamsData = [
     { name: 'Sunrisers Hyderabad', points: 6, position: 8 },
 ];
 
-const Leaderboard = () => {
+const LeaderboardPage = () => {
     return (
         <main >
             <Navbar />
@@ -33,4 +33,4 @@ const Leaderboard = () => {
     );
 };
 
-export default Leaderboard;
+export default LeaderboardPage;

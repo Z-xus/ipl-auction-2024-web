@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { DashboardPage, LoginPage, CalculatorPage, SpectatePage } from './components';
-import LeaderBoard from './components/LeaderBoard/leaderboard';
+import { DashboardPage, LoginPage, LeaderboardPage, CalculatorPage, SpectatePage } from './components';
 import './App.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -13,7 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path='/dashboard' element={<DashboardPage />} />
         <Route path='/calculator' element={<CalculatorPage />} />
         <Route path='/calculator' element={<CalculatorPage />} />
-        <Route path='/leaderboard' element={<LeaderBoard />} />
+        <Route path='/leaderboard' element={<LeaderboardPage />} />
         <Route path='/spectate/:teamName' element={<SpectatePage />} />
       </Routes>
     </BrowserRouter>
