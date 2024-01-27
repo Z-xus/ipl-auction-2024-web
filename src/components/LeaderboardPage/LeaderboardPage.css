@@ -3,7 +3,7 @@
   font-family: 'Dosis', Helvetica, sans-serif;
   font-weight: 800;
   color: white;
-  letter-spacing: 3px;
+  letter-spacing: 5px;
 }
 
 .tilted-border {
@@ -21,4 +21,16 @@
   transform: skewX(-12deg); /* Adjust the skew angle as needed */
   width: 9px; /* Adjust the width of the tilted border as needed */
   background-color: #367F97; /* Set the background color to match the container */
+}
+
+.bg {
+  /* Set the background image */
+  background-image: url('../../../public/images/background/leaderboard.jpeg');
+
+  /* Set the background size */
+  background-size: 100% 100%;
+  background-attachment: fixed;
+
+  /* Set background repeat properties if needed */
+  background-repeat: no-repeat;
 }
