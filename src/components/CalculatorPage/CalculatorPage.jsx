@@ -1,9 +1,9 @@
 // import React from 'react';
 import { useState } from 'react';
-import { Navbar, Card, Popup } from "../Utils"
-import { RadioBox, CardContainer, Box, Button } from "./Utils.jsx";
-import playerData from "./assets/player";
-import "./style.css";
+import { Navbar, Card, Popup } from '../Utils';
+import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
+import playerData from './assets/player';
+import './CalculatorPage.css';
 
 const CalculatorPage = () => {
 
@@ -125,7 +125,7 @@ const CalculatorPage = () => {
                 <Box id={2} label="MO:" isSelected={selectedBox === 2} onSelect={handleBoxSelect} />
                 <Box id={3} label="DTH:" isSelected={selectedBox === 3} onSelect={handleBoxSelect} />
             </div>
-            <div className="card-placeholder h-[11.7rem] flex justify-center items-center my-8"
+            <div className="card-placeholder h-[11.7rem] flex justify-center items-center my-7"
                 onDrop={handleOnDrop} onDragOver={handleDragOver}
             >
                 {!playerCards.length && <span className="placeholder-text text-xl mx-4 flex">Drop your cards here!</span>}

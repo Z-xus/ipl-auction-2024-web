@@ -30,13 +30,8 @@
 /* body  */
 .calculator 
 {
-    background-image: url('./assets/bg-img.png') !important;
-    object-fit: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    padding-bottom: 50px;
     height: 100vh;
+    backdrop-filter: blur(12.5px);
 }
 
 .card-placeholder {
