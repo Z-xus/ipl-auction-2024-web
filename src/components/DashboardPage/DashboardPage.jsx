@@ -1,6 +1,8 @@
-// import React from "react";
-import { Navbar } from "../Utils";
-import Powercard from "./Powercard";
+// import React from 'react';
+import PropTypes from 'prop-types';
+import { Navbar, Card, Powercard } from "../Utils";
+// Need to clean this up
+import players from "../CalculatorPage/assets/player.json"
 import "./DashboardPage.css"
 
 const dummyTeam = {
@@ -12,7 +14,7 @@ const dummyTeam = {
   "score": 78,
   "players": [],
   "powercards": [
-    { name: "focusfire", isUsed: false },
+    { name: "focus fire", isUsed: false },
     { name: "double right to match", isUsed: true },
     { name: "god's eye", isUsed: true },
     { name: "right to match", isUsed: true },
@@ -27,48 +29,92 @@ const dummyTeam = {
  * @returns {string} The formatted string with suffix.
  */
 function numberConvert(number) {
-  let num = Number(number);
+  let num = Math.abs(Number(number));
   let sign = Math.sign(num);
-  num = Math.abs(num);
 
   if (num >= 1e7)
-    return sign * (num / 1e7).toFixed(1) + ' CR';
+    return `${sign * (num / 1e7).toFixed(1)} CR`;
   else if (num >= 1e5)
-    return sign * (num / 1e5).toFixed(1) + ' L';
+    return `${sign * (num / 1e5).toFixed(1)} L`;
   else if (num >= 1e3)
-    return sign * (num / 1e3).toFixed(1) + ' K';
+    return `${sign * (num / 1e3).toFixed(1)} K`;
   else
     return (sign * num).toString();
 }
 
-const DashboardPage = () => {
+const TeamPlayers = ({ type, data }) => {
+  if (!data.find(player => player.type === type)) return;
+
+  return (
+    <div className='flex flex-col'>
+
+      <p className='powercard-text text-xl'>{type}</p>
+      <div className='flex flex-wrap items-center justify-evenly'>
+        {data.map(player => (
+          player.type === type &&
+          <div className="px-16 py-8" key={player.playerName}>
+            <Card data={player} />
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
+};
+
+TeamPlayers.propTypes = {
+  type: PropTypes.string.isRequired,
+  data: PropTypes.array.isRequired
+};
+
+const DashboardPage = ({ teamDetails }) => {
+  const playerTypes = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];
+
+  // TODOs:
+  // Implement Functionality
+
+  if (!teamDetails) {
+    teamDetails = dummyTeam;
+    dummyTeam.players = players;
+  }
+
   return (
     <div className="dashboard-container">
+      {/* Navbar */}
       <nav className="col-span-2">
         <Navbar />
       </nav>
 
+      {/* Team Data */}
       <div className="team-container flex-col px-4">
+        {/* Budget Info */}
         <div className="flex flex-col items-center">
-          <img className="w-3/5" src={`./images/teamlogo/${dummyTeam.teamName.toLowerCase()}.png`} alt="" />
+          <img className="w-3/5" src={`/images/teamlogo/${teamDetails.teamName.toLowerCase()}.png`} alt="" />
           <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
-          <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(dummyTeam.budget)}</p>
+          <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(teamDetails.budget)}</p>
           <hr className="w-11/12" />
         </div>
 
+        {/* Powercard Info */}
         <div className="flex flex-col items-center">
           <p className="powercard-text">POWERCARDS</p>
           <div className="powerupcard-container">
-            {dummyTeam.powercards.map((pc, index) => {
-              return <Powercard key={index} name={pc.name} isUsed={pc.isUsed} />
-            })}
+            {teamDetails.powercards.map(({ name, isUsed }, index) => (<Powercard key={index} name={name} isUsed={isUsed} />))}
           </div>
         </div>
       </div>
 
-      <div className="team-players-container">Main Content Template</div>
+      {/* Team Players */}
+      <div className="overflow-y-auto m-1/12 p-2 custom-scrollbar">
+        <p className='powercard-text text-2xl my-2'> CURRENT TEAM PLAYERS </p>
+        {playerTypes.map(type => (<TeamPlayers key={type} type={type} data={teamDetails.players} />))}
+      </div>
     </div>
   );
+};
+
+DashboardPage.propTypes = {
+  teamDetails: PropTypes.object
 };
 
 export default DashboardPage;
