@@ -77,6 +77,7 @@ const CalculatorPage = () => {
     const handleClearCards = () => {
         // clears all cards.
         // remove all cards from playerCards[] and put all into availablePlayers[]
+        setPoints(0);
         setavailablePlayers((prevPlayers) => [...prevPlayers, ...playerCards]);
         setPlayerCards([]);
 
