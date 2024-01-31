@@ -1,6 +1,7 @@
-// import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from '../Utils'
 import './LeaderboardPage.css'
+import io from 'socket.io-client';
 
 const teamsData = [
   { name: 'Mumbai Indians', points: 20, position: 1 },
@@ -13,6 +14,8 @@ const teamsData = [
   { name: 'Sunrisers Hyderabad', points: 6, position: 8 },
 ];
 
+const socket = io(`http://localhost:3000`);
+
 const LeaderboardItem = ({ position, name, points }) => (
   <div className="flex items-center justify-between mb-3 min-h-12 text-center">
     <div className="text-3xl font-extrabold mx-1 min-w-8 min-h-8 p-1 px-2 bg-yellow-500 text-black">{position}</div>
@@ -22,6 +25,30 @@ const LeaderboardItem = ({ position, name, points }) => (
 );
 
 const LeaderboardPage = () => {
+
+  const [isConnected, setIsConnected] = useState(socket.connected);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log("connected");
+      setIsConnected(true);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+    });
+
+    socket.on('scoreUpdate',(data)=>{
+      console.log(data);
+    });
+  
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('pong');
+    };
+  }, []);
+
   return (
     <div className="flex flex-col h-screen">
       <Navbar style={{ backdropFilter: 'blur(12.5px)' }} />

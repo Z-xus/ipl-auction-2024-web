@@ -23,6 +23,8 @@ const dummyTeam = {
   ]
 };
 
+const socket = io(`http://localhost:3000`);
+
 function numberConvert(number) {
   let num = Math.abs(Number(number));
   let sign = Math.sign(num);
@@ -62,6 +64,34 @@ TeamPlayers.propTypes = {
 
 const DashboardPage = ({ teamDetails }) => {
   const playerTypes = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];  
+  const [isConnected, setIsConnected] = useState(socket.connected);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log("connected");
+      setIsConnected(true);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+    });
+
+    socket.on('playerAdded',(data)=>{
+      console.log(data);
+      //rendering logic should come here altho not so sure but 99% yahi aayega
+    })
+
+    socket.on('playerDeleted',(data)=>{
+      console.log(data);
+      //derendering logic should come here altho not so sure but 99% yahi aayega
+    })
+  
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('pong');
+    };
+  }, []);
 
   if (!teamDetails) {
     teamDetails = dummyTeam;
