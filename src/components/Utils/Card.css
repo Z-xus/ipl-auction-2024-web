@@ -1,151 +1,57 @@
-.card{
-  width: 10vw;
+.card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 13vw;
-  cursor: pointer;
-  border-radius: 30px;
-}
-.cardFront{
   width: 10vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   height: 13vw;
   cursor: pointer;
-  border-radius: 30px;
-}
-.cardBack{
-  width: 10vw;
-  display: flex;
-  align-items: center;
-  height: 13vw;
-  cursor: pointer;
+  border: .2rem solid gray;
   border-radius: 30px;
 }
 
-.player-img{
-  height: 60%;
-  width: 100%;
-  display: flex;
-  
-}
-.frontPlayerImg{
-  width: 100%;
-  display: flex;
+.card-front,
+.card-back {
+  align-items: stretch;
+  background-image: url('/images/background/card.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 1.5rem;
 }
 
-.card-footer{
-  height: 18%;
-  background-color: white;
-  display: flex;
-  justify-content: center;
-  width: 90%;
-  font-size: 1vw;
-  border-radius: 40px 40px 40px 40px;
-}
-.player-name{
-  
-      width: 100%;
-      height:15% ; 
-      text-align: center;
-      white-space:normal;
-      display: flex;
-      font-weight: bolder;
-      font-size: 1vw;
-      flex-direction: column;
-      justify-content: center;
-      height:25%;
-      padding:0.3rem;
-      text-shadow: 0px 4px 4px black;
-      color: white;
-      word-wrap:break-word;
-      text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-      font-family: Ek Mukta;
-      
-}
-
-.flag{
-  display: flex;
-  align-items: center;
-  width: 50%;
-}
-.bat-ball{
-  display: flex;
-  align-items: center;
-  width: 50%;
-}
-.price{
-  width: 85%;
-  color: black;
+.player-name {
+  font-size: 1.1rem;
+  font-family: 'Economica', Verdana, Geneva, Tahoma, sans-serif;
   font-weight: 700;
-  font-size: 1.2vw;
-  display: flex;
-  align-items: center;
-  }
-.player-img img{
-  max-width: 100%;
+  line-height: 1.4rem;
+  color: #FFF;
+  text-align: center;
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
-.typeBtn{
-  width: calc(100%/3);
+
+.front-stat-container,
+.back-stat-container {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   background-color: white;
-  border: none;
-  font-size: 1vw;
-  border-top: 2px black solid;
-  cursor: pointer;
+  border-radius: .5rem;
+  text-align: center;
 }
-.batStat,.bowlStat{
-  width: 48%;
-  height: 65%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  font-size: 1vw;
-  font-weight: 900;
-  color: whitesmoke;
+
+.front-stat-container {
   align-items: center;
-  text-shadow: 0px 2px 4px black;
+  padding: 0.25rem;
 }
-.player-back-stats{
-  font-weight: bold;
-  width: 96%;
-  height: 20%;
-  display: flex;
-  font-size: 1.2vw;
-  justify-content: center;
-  color: white;
-  align-items: center;
-  text-shadow: 0px 2px 4px black;
-  flex-direction: column;
+
+.back-stat-container {
+  margin: .25rem .25rem 0 .25rem;
+  padding: .5rem;
 }
-@media only screen and (max-width:1000px) {
-  .card{
-      height: 35vw;
-      width:26vw;
-      border-radius: 20px;
-  }
-  .cardFront{
-      height: 35vw;
-      border-radius: 20px;
-      width:26vw;
-  }
-  .cardBack{
-      height: 35vw;
-      border-radius: 20px;
-      width:26vw;
-  }
-  .player-name{
-      font-size: 2.5vw;
-  }
-  .player-front-stats{
-      font-size: 2.5vw;
-  }
-  .price{
-      font-size: 2.5vw;
-      justify-content: space-around;
-  }
-  .batStat,.bowlStat{
-      font-size: 2.5vw;
-  }
+
+.stat-text {
+  font-size: .9rem;
+  font-family: "DroidSans-Bold", Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: 700;
+  color: #1B223E;
 }
