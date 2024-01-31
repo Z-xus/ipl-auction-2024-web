@@ -1,9 +1,9 @@
-// import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Navbar, Card, Powercard } from "../Utils";
-// Need to clean this up
-import players from "../CalculatorPage/assets/player.json"
-import "./DashboardPage.css"
+import players from "../CalculatorPage/assets/player.json";
+import "./DashboardPage.css";
+import io from 'socket.io-client';
 
 const dummyTeam = {
   "username": "user1",
@@ -21,13 +21,8 @@ const dummyTeam = {
     { name: "silent reserve", isUsed: true },
     { name: "stealth bid", isUsed: false }
   ]
-}
+};
 
-/**
- * Adds appropriate suffix to Number 
- * @param {number} number - The input number to be formatted.
- * @returns {string} The formatted string with suffix.
- */
 function numberConvert(number) {
   let num = Math.abs(Number(number));
   let sign = Math.sign(num);
@@ -43,11 +38,10 @@ function numberConvert(number) {
 }
 
 const TeamPlayers = ({ type, data }) => {
-  if (!data.find(player => player.type === type)) return;
+  if (!data.find(player => player.type === type)) return null;
 
   return (
     <div className='flex flex-col'>
-
       <p className='powercard-text text-xl'>{type}</p>
       <div className='flex flex-wrap items-center justify-evenly'>
         {data.map(player => (
@@ -57,7 +51,6 @@ const TeamPlayers = ({ type, data }) => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };
@@ -68,10 +61,7 @@ TeamPlayers.propTypes = {
 };
 
 const DashboardPage = ({ teamDetails }) => {
-  const playerTypes = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];
-
-  // TODOs:
-  // Implement Functionality
+  const playerTypes = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];  
 
   if (!teamDetails) {
     teamDetails = dummyTeam;
