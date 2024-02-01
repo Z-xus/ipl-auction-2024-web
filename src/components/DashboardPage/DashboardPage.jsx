@@ -86,6 +86,10 @@ const DashboardPage = ({ teamDetails }) => {
       //derendering logic should come here altho not so sure but 99% yahi aayega
     })
   
+    socket.on('powercardAdded',(data)=>{
+      console.log(data);
+    })
+
     return () => {
       socket.off('connect');
       socket.off('disconnect');
