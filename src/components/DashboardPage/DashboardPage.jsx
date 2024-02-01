@@ -48,7 +48,7 @@ const TeamPlayers = ({ type, data }) => {
       <div className='flex flex-wrap items-center justify-evenly'>
         {data.map(player => (
           player.type === type &&
-          <div className="px-16 py-8" key={player.playerName}>
+          <div className="px-8 py-4" key={player.playerName}>
             <Card data={player} />
           </div>
         ))}

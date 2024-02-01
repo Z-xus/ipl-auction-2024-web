@@ -55,9 +55,9 @@ a:hover {
 
 body {
   background-image: url('/images/background/main.png');
-  background-size: 100% 100%;
+  background-size: cover;
   background-repeat: no-repeat;
-  background-position: bottom;
+  background-position: center;
   min-width: 320px;
   min-height: 100vh;
 }
