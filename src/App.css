@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* Saving for later. */
 
 @font-face {
   src: local('Gilroy-Regular'), url(/fonts/Gilroy-Regular.ttf) format('truetype');
@@ -23,35 +22,32 @@
   font-family: 'DroidSans-Bold';
 }
 
-* {
-  margin: 0;
-  padding: 0;
-}
-
-/* :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+:root {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+* {
+  margin: 0;
+  padding: 0;
 }
-a:hover {
-  color: #535bf2;
+
+/* Scrollbar styles */
+* {
+  scrollbar-width: 2rem;
+  scrollbar-color: rgba(88, 130, 193, 0.50) #292929;
 }
- */
+
+*::-webkit-scrollbar {
+  width: 2rem;
+  background-color: rgba(88, 130, 193, 0.50);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
 
 body {
   background-image: url('/images/background/main.png');
@@ -62,24 +58,17 @@ body {
   min-height: 100vh;
 }
 
-.custom-scrollbar {
-  scrollbar-width: 2rem;
-  scrollbar-color: rgba(88, 130, 193, 0.50) transparent;
+/*
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 2rem;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background-color: rgba(88, 130, 193, 0.50);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: transparent;
-}
-
-/* h1 {
+h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
@@ -108,10 +97,10 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
-  a:hover {
-    color: #747bff;
+a:hover {
+  color: #747bff;
   }
-  button {
-    background-color: #f9f9f9;
+button {
+  background-color: #f9f9f9;
   }
 } */
