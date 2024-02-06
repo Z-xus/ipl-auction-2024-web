@@ -76,17 +76,17 @@ const DashboardPage = ({ teamDetails }) => {
       setIsConnected(false);
     });
 
-    socket.on('playerAdded',(data)=>{
+    socket.on('playerAddedTeam22',(data)=>{   //endpoint should be of format playerAddedteamNameslot
       console.log(data);
       //rendering logic should come here altho not so sure but 99% yahi aayega
     })
 
-    socket.on('playerDeleted',(data)=>{
+    socket.on('playerDeletedTeam22',(data)=>{
       console.log(data);
       //derendering logic should come here altho not so sure but 99% yahi aayega
     })
   
-    socket.on('powercardAdded',(data)=>{
+    socket.on('powercardAddedTeam22',(data)=>{
       console.log(data);
     })
 
