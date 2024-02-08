@@ -38,8 +38,9 @@ const LeaderboardPage = () => {
       setIsConnected(false);
     });
 
-    socket.on('scoreUpdateTeam22',(data)=>{ //refer dashboard for why Team22
+    socket.on('scoreUpdate2',(data)=>{ //refer dashboard for why Team22
       console.log(data);
+      
     });
   
     return () => {
