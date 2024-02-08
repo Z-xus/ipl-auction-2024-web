@@ -68,12 +68,21 @@ TeamPlayers.propTypes = {
 
 const DashboardPage = ({ teamDetails }) => {
   const playerTypes = ['batsman', 'bowler', 'all-rounder', 'wicket-keeper'];
-  const team = localStorage.getItem("team");
-  const slot = localStorage.getItem("slot");
-  const budget = localStorage.getItem("budget");
+  const [username, setUsername] = useState(localStorage.getItem("username"));
+  const [team, setTeam] = useState(localStorage.getItem("team"));
+  const [slot, setSlot] = useState(localStorage.getItem("slot"));
+  const [budget, setBudget] = useState(localStorage.getItem("budget"));
   const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")));
-  const powercards = JSON.parse(localStorage.getItem("powercards"));
+  const [powercards, setPowercards] = useState(JSON.parse(localStorage.getItem("powercards")));
   const [isConnected, setIsConnected] = useState(socket.connected);
+
+  if (teamDetails) {
+    setTeam(teamDetails.teamName);
+    setSlot(teamDetails.slot);
+    setBudget(teamDetails.buget);
+    setPlayers(JSON.stringify(teamDetails.players));
+    setPowercards(JSON.stringify(teamDetails.powercards));
+  }
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -85,7 +94,7 @@ const DashboardPage = ({ teamDetails }) => {
       setIsConnected(false);
     });
 
-    socket.on(`playerAdded${team}${slot}`, (data) => {   //endpoint should be of format playerAddedteamNameslot
+    socket.on(`playerAdded${team}${slot}`, (data) => {
       console.log(data);
       const newPlayerId = data.payload._id;
       setPlayers([...players, newPlayerId]);
@@ -102,23 +111,22 @@ const DashboardPage = ({ teamDetails }) => {
         setPlayers(updatedPlayers);
         localStorage.setItem("players", JSON.stringify(updatedPlayers));
       }
-      //derendering logic should come here altho not so sure but 99% yahi aayega
     })
 
     socket.on(`powercardAdded${team}${slot}`, (data) => {
       console.log(data);
     })
-    
-    socket.on('teamAllocateuser44',(data)=>{
+
+    socket.on(`teamAllocate${username}${slot}`, (data) => {
       console.log(data);
     })
-    
+
     return () => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, [setPlayers, players, slot, team]);
+  }, [setPlayers, username, team, slot, players]);
 
   return (
     <div className="dashboard-container">
