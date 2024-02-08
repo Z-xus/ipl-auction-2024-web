@@ -3,16 +3,17 @@ import { Navbar } from '../Utils'
 import './LeaderboardPage.css'
 import io from 'socket.io-client';
 
-const teamsData = [
-  { name: 'Mumbai Indians', points: 20, position: 1 },
-  { name: 'Chennai Super Kings', points: 18, position: 2 },
-  { name: 'Delhi Capitals', points: 16, position: 3 },
-  { name: 'Royal Challengers Bangalore', points: 14, position: 4 },
-  { name: 'Kolkata Knight Riders', points: 12, position: 5 },
-  { name: 'Rajasthan Royals', points: 10, position: 6 },
-  { name: 'Kings XI Punjab', points: 8, position: 7 },
-  { name: 'Sunrisers Hyderabad', points: 6, position: 8 },
-];
+// const teamsData = [
+//   { name: 'Mumbai Indians', points: 20, position: 1 },
+//   { name: 'Chennai Super Kings', points: 18, position: 2 },
+//   { name: 'Delhi Capitals', points: 16, position: 3 },
+//   { name: 'Royal Challengers Bangalore', points: 14, position: 4 },
+//   { name: 'Kolkata Knight Riders', points: 12, position: 5 },
+//   { name: 'Rajasthan Royals', points: 10, position: 6 },
+//   { name: 'Kings XI Punjab', points: 8, position: 7 },
+//   { name: 'Sunrisers Hyderabad', points: 6, position: 8 },
+// ];
+
 
 const socket = io(`http://localhost:3000`);
 
@@ -24,9 +25,14 @@ const LeaderboardItem = ({ position, name, points }) => (
   </div>
 );
 
+
+
 const LeaderboardPage = () => {
 
   const [isConnected, setIsConnected] = useState(socket.connected);
+  const [teamsData, setTeamsData] = useState([]);
+  
+
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -38,10 +44,34 @@ const LeaderboardPage = () => {
       setIsConnected(false);
     });
 
-    socket.on('scoreUpdate2',(data)=>{ //refer dashboard for why Team22
-      console.log(data);
-      
+    // socket.on('scoreUpdate2', (data) => {
+    //   setTeamsData(prevTeamsData => {
+    //     const obj = { name: data.payload.teamName, points: data.payload.score };
+    //     console.log(obj);
+    //     return [...prevTeamsData, obj];
+    //   });
+    // });
+
+    socket.on('scoreUpdate2', (data) => {
+      setTeamsData(prevTeamsData => {
+        console.log(data);
+        const teamName = data.payload.teamName;
+        
+        // Check if the team already exists in prevTeamsData
+        const teamExists = prevTeamsData.some(team => team.name === teamName);
+    
+        // If the team doesn't exist, add it to the array
+        if (!teamExists) {
+          const obj = { name: teamName, points: data.payload.score };
+          console.log(obj);
+          return [...prevTeamsData, obj];
+        }
+    
+        // If the team already exists, return the current state without modification
+        return prevTeamsData;
+      });
     });
+    
   
     return () => {
       socket.off('connect');
@@ -50,13 +80,22 @@ const LeaderboardPage = () => {
     };
   }, []);
 
+
   return (
     <div className="flex flex-col h-screen">
       <Navbar style={{ backdropFilter: 'blur(12.5px)' }} />
       <div className="flex flex-col items-center flex-grow overflow-y-auto custom-scrollbar" style={{ backdropFilter: 'blur(12.5px)' }}>
         <h2 className="title text-7xl my-16"> LEADERBOARD </h2>
         <div className="flex flex-col flex-grow justify-evenly p-2">
-          {teamsData.map(team => <LeaderboardItem key={team.position} position={team.position} name={team.name} points={team.points} />)}
+          {
+          teamsData.length > 0 ? (teamsData.sort((a,b) => b.points - a.points)
+          .map(
+            
+             (team,index) => <LeaderboardItem key={team.name} position={index+1} name={team.name} points={team.points} />
+            
+            )
+          ) : <div className="mt-2 text-3xl">Scoreboard will be displayed shortly...</div>
+          }
         </div>
       </div>
     </div>

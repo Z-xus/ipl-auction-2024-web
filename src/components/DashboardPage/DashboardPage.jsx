@@ -23,30 +23,31 @@ function numberConvert(number) {
 }
 
 const TeamPlayers = ({ type, data }) => {
-  // if (!data.find(player => player.type === type)) return null;
   const [playersData, setPlayersData] = useState([]);
 
   useEffect(() => {
     const fetchPlayerData = async () => {
       try {
         const playerPromises = data.map(async (playerID) => {
-          const response = await axios.get(`${import.meta.env.VITE_SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
+          const response = await axios.post(`${import.meta.env.VITE_SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
           return response.data;
         });
 
         const resolvedPlayers = await Promise.all(playerPromises);
-        console.log(resolvedPlayers);
         setPlayersData(resolvedPlayers);
       } catch (error) {
         console.error('Error fetching player data:', error);
       }
     };
+
     fetchPlayerData();
-  }, [data, type]);
+  }, [data]);
+
+  if (!playersData.find(player => player.type === type)) return null;
 
   return (
     <div className='flex flex-col'>
-      <p className='powercard-text text-xl'>{type}</p>
+      <p className='powercard-text text-xl'>{type.toUpperCase()}</p>
       <div className='flex flex-wrap items-center justify-evenly'>
         {playersData.map(player => (
           player.type === type &&
@@ -68,8 +69,9 @@ TeamPlayers.propTypes = {
 const DashboardPage = ({ teamDetails }) => {
   const playerTypes = ['batsman', 'bowler', 'all-rounder', 'wicket-keeper'];
   const team = localStorage.getItem("team");
+  const slot = localStorage.getItem("slot");
   const budget = localStorage.getItem("budget");
-  const players = JSON.parse(localStorage.getItem("players"));
+  const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")));
   const powercards = JSON.parse(localStorage.getItem("powercards"));
   const [isConnected, setIsConnected] = useState(socket.connected);
 
@@ -83,17 +85,27 @@ const DashboardPage = ({ teamDetails }) => {
       setIsConnected(false);
     });
 
-    socket.on('playerAddedTeam22', (data) => {   //endpoint should be of format playerAddedteamNameslot
+    socket.on(`playerAdded${team}${slot}`, (data) => {   //endpoint should be of format playerAddedteamNameslot
       console.log(data);
-      //rendering logic should come here altho not so sure but 99% yahi aayega
+      const newPlayerId = data.payload._id;
+      setPlayers([...players, newPlayerId]);
+      localStorage.setItem("players", JSON.stringify(players));
     })
 
-    socket.on('playerDeletedTeam22', (data) => {
+    socket.on(`playerDeleted${team}${slot}`, (data) => {
       console.log(data);
+      const newPlayerId = data.payload._id;
+      const playerIndex = players.indexOf(newPlayerId);
+
+      if (playerIndex !== -1) {
+        const updatedPlayers = [...players.slice(0, playerIndex), ...players.slice(playerIndex + 1)];
+        setPlayers(updatedPlayers);
+        localStorage.setItem("players", JSON.stringify(updatedPlayers));
+      }
       //derendering logic should come here altho not so sure but 99% yahi aayega
     })
 
-    socket.on('powercardAddedTeam22', (data) => {
+    socket.on(`powercardAdded${team}${slot}`, (data) => {
       console.log(data);
     })
     
@@ -106,7 +118,7 @@ const DashboardPage = ({ teamDetails }) => {
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, []);
+  }, [setPlayers, players, slot, team]);
 
   return (
     <div className="dashboard-container">

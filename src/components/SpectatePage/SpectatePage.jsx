@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DashboardPage } from '../'
 
+
 const dummyTeam = {
   "username": "user1",
   "password": "password1",
@@ -22,6 +23,7 @@ const dummyTeam = {
 }
 
 const SpectatePage = () => {
+  
   const { teamName } = useParams();
   const [teamDetails, setTeamDetails] = useState(null);
 
