@@ -96,7 +96,11 @@ const DashboardPage = ({ teamDetails }) => {
     socket.on('powercardAddedTeam22', (data) => {
       console.log(data);
     })
-
+    
+    socket.on('teamAllocateuser44',(data)=>{
+      console.log(data);
+    })
+    
     return () => {
       socket.off('connect');
       socket.off('disconnect');
