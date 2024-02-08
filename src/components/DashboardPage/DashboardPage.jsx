@@ -1,29 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// import React from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import PropTypes from 'prop-types';
-import { Navbar, Card, Powercard } from "../Utils";
-import players from "../CalculatorPage/assets/player.json";
-import "./DashboardPage.css";
 import io from 'socket.io-client';
+import { Navbar, Card, Powercard } from "../Utils";
+import "./DashboardPage.css";
 
-const dummyTeam = {
-  "username": "user1",
-  "password": "password1",
-  "slot": 1,
-  "teamName": "MI",
-  "budget": 987656789,
-  "score": 78,
-  "players": [],
-  "powercards": [
-    { name: "focus fire", isUsed: false },
-    { name: "double right to match", isUsed: true },
-    { name: "god's eye", isUsed: true },
-    { name: "right to match", isUsed: true },
-    { name: "silent reserve", isUsed: true },
-    { name: "stealth bid", isUsed: false }
-  ]
-};
-
-const socket = io(`http://localhost:3000`);
+const socket = io(`${import.meta.env.VITE_SERVERURL}`);
 
 function numberConvert(number) {
   let num = Math.abs(Number(number));
@@ -40,18 +23,38 @@ function numberConvert(number) {
 }
 
 const TeamPlayers = ({ type, data }) => {
-  if (!data.find(player => player.type === type)) return null;
+  // if (!data.find(player => player.type === type)) return null;
+  const [playersData, setPlayersData] = useState([]);
+
+  useEffect(() => {
+    const fetchPlayerData = async () => {
+      try {
+        const playerPromises = data.map(async (playerID) => {
+          const response = await axios.get(`${import.meta.env.VITE_SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
+          return response.data;
+        });
+
+        const resolvedPlayers = await Promise.all(playerPromises);
+        console.log(resolvedPlayers);
+        setPlayersData(resolvedPlayers);
+      } catch (error) {
+        console.error('Error fetching player data:', error);
+      }
+    };
+    fetchPlayerData();
+  }, [data, type]);
 
   return (
     <div className='flex flex-col'>
       <p className='powercard-text text-xl'>{type}</p>
       <div className='flex flex-wrap items-center justify-evenly'>
-        {data.map(player => (
+        {playersData.map(player => (
           player.type === type &&
           <div className="px-8 py-4" key={player.playerName}>
             <Card data={player} />
           </div>
-        ))}
+        )
+        )}
       </div>
     </div>
   );
@@ -63,7 +66,11 @@ TeamPlayers.propTypes = {
 };
 
 const DashboardPage = ({ teamDetails }) => {
-  const playerTypes = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];  
+  const playerTypes = ['batsman', 'bowler', 'all-rounder', 'wicket-keeper'];
+  const team = localStorage.getItem("team");
+  const budget = localStorage.getItem("budget");
+  const players = JSON.parse(localStorage.getItem("players"));
+  const powercards = JSON.parse(localStorage.getItem("powercards"));
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
@@ -76,17 +83,17 @@ const DashboardPage = ({ teamDetails }) => {
       setIsConnected(false);
     });
 
-    socket.on('playerAddedTeam22',(data)=>{   //endpoint should be of format playerAddedteamNameslot
+    socket.on('playerAddedTeam22', (data) => {   //endpoint should be of format playerAddedteamNameslot
       console.log(data);
       //rendering logic should come here altho not so sure but 99% yahi aayega
     })
 
-    socket.on('playerDeletedTeam22',(data)=>{
+    socket.on('playerDeletedTeam22', (data) => {
       console.log(data);
       //derendering logic should come here altho not so sure but 99% yahi aayega
     })
-  
-    socket.on('powercardAddedTeam22',(data)=>{
+
+    socket.on('powercardAddedTeam22', (data) => {
       console.log(data);
     })
 
@@ -96,11 +103,6 @@ const DashboardPage = ({ teamDetails }) => {
       socket.off('pong');
     };
   }, []);
-
-  if (!teamDetails) {
-    teamDetails = dummyTeam;
-    dummyTeam.players = players;
-  }
 
   return (
     <div className="dashboard-container">
@@ -113,9 +115,9 @@ const DashboardPage = ({ teamDetails }) => {
       <div className="team-container flex-col px-4">
         {/* Budget Info */}
         <div className="flex flex-col items-center">
-          <img className="w-3/5" src={`/images/teamlogo/${teamDetails.teamName.toLowerCase()}.png`} alt="" />
+          <img className="w-3/5" src={`/images/teamlogo/${team.toLowerCase()}.png`} alt="" />
           <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
-          <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(teamDetails.budget)}</p>
+          <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(budget)}</p>
           <hr className="w-11/12" />
         </div>
 
@@ -123,7 +125,7 @@ const DashboardPage = ({ teamDetails }) => {
         <div className="flex flex-col items-center">
           <p className="powercard-text">POWERCARDS</p>
           <div className="powerupcard-container">
-            {teamDetails.powercards.map(({ name, isUsed }, index) => (<Powercard key={index} name={name} isUsed={isUsed} />))}
+            {powercards.map(({ name, isUsed }, index) => (<Powercard key={index} name={name} isUsed={isUsed} />))}
           </div>
         </div>
       </div>
@@ -131,7 +133,7 @@ const DashboardPage = ({ teamDetails }) => {
       {/* Team Players */}
       <div className="overflow-y-auto m-1/12 p-2 custom-scrollbar">
         <p className='powercard-text text-2xl my-2'> CURRENT TEAM PLAYERS </p>
-        {playerTypes.map(type => (<TeamPlayers key={type} type={type} data={teamDetails.players} />))}
+        {playerTypes.map(type => (<TeamPlayers key={type} type={type} data={players} />))}
       </div>
     </div>
   );

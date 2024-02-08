@@ -8,7 +8,7 @@ import './LoginPage.css';
 const Input = ({ type, name, placeholder, label, onChange }) => (
   <div className="input-group">
     <label className="input-label" htmlFor={label}>{name}</label>
-    <input className="input-field" type={type} id={label} placeholder={placeholder} onChange={onChange}/>
+    <input className="input-field" type={type} id={label} placeholder={placeholder} onChange={onChange} />
   </div>
 );
 
@@ -39,7 +39,10 @@ const LoginPage = () => {
       localStorage.clear();
       localStorage.setItem("username", data.user.username);
       localStorage.setItem("team", data.user.teamName);
-      localStorage.setItem("slot", slot);
+      localStorage.setItem("slot", data.user.slot);
+      localStorage.setItem("budget", data.user.buget);
+      localStorage.setItem("players", JSON.stringify(data.user.players));
+      localStorage.setItem("powercards", JSON.stringify(data.user.powercards));
       navigate("/dashboard");
     } else {
       alert(data.message);
