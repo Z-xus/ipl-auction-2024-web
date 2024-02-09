@@ -20,6 +20,7 @@ NavButton.propTypes = {
 };
 
 const SidebarItem = ({ url, logo, abbrv }) => (
+
   <Link to={url} className="spectate-content justify-center" key={abbrv}>
     <img className="team-logo" src={logo} alt={`${abbrv} logo`} />
     <p>{abbrv.toUpperCase()}</p>
@@ -103,14 +104,17 @@ const Navbar = ({ style = {} }) => {
               </button>
             </div>
 
-            {Object.entries(teams).map(([abbrv]) => (
+            {Object.entries(teams)
+            .filter(([abbrv]) => abbrv.toUpperCase() !== localStorage.getItem('team'))
+            .map(([abbrv]) => ( 
               <SidebarItem
                 key={abbrv}
                 url={`/spectate/${abbrv}`}
                 logo={`/images/teamlogo/${abbrv}.png`}
                 abbrv={abbrv}
               />
-            ))}
+          ))}
+
 
           </div>
 

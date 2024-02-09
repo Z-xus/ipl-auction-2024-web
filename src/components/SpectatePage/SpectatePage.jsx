@@ -7,11 +7,13 @@ import axios from 'axios';
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 
 const SpectatePage = () => {
+  
   const { teamName } = useParams();
   const [teamDetails, setTeamDetails] = useState(null);
   const slot = localStorage.getItem('slot');
 
   useEffect(() => {
+
     const fetchData = async () => {
       try {
         const response = await axios.get(`${SERVERURL}/spectate/${teamName.toUpperCase()}/${slot}`);
