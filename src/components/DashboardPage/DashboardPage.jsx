@@ -150,7 +150,21 @@ const DashboardPage = ({ teamDetails }) => {
       })
 
       socket.on(`powercardAdded${team}${slot}`, (data) => {
-        console.log(data);
+        const updatedPowercards = data.payload;
+
+        setPowercards(prevPowercards => {
+          const tempPowercards = JSON.parse(localStorage.getItem("powercards"));
+
+          if (JSON.stringify(prevPowercards) != JSON.stringify(tempPowercards)) {
+            // We are on Spectate Page, Don't update display
+            localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
+            return prevPowercards;
+          }
+
+          // Return updated powercards list
+          localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
+          return updatedPowercards;
+        });
       })
 
       socket.on(`teamAllocate${username}${slot}`, (data) => {
@@ -176,7 +190,7 @@ const DashboardPage = ({ teamDetails }) => {
       <div className="team-container flex-col px-4">
         {/* Budget Info */}
         <div className="flex flex-col items-center">
-          <img className="w-3/5" src={`/images/teamlogo/${team.toLowerCase()}.png`} alt="" />
+          <img className="max-h-52 py-6" src={`/images/teamlogo/${team.toLowerCase()}.png`} alt="" />
           <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
           <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(budget)}</p>
           <hr className="w-11/12" />
