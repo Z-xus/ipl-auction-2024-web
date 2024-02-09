@@ -6,7 +6,8 @@ import io from 'socket.io-client';
 import { Navbar, Card, Powercard } from "../Utils";
 import "./DashboardPage.css";
 
-const socket = io(`${import.meta.env.VITE_SERVERURL}`);
+const SERVERURL = import.meta.env.VITE_SERVERURL;
+const socket = io(SERVERURL);
 
 function numberConvert(number) {
   let num = Math.abs(Number(number));
@@ -29,7 +30,7 @@ const TeamPlayers = ({ type, data }) => {
     const fetchPlayerData = async () => {
       try {
         const playerPromises = data.map(async (playerID) => {
-          const response = await axios.post(`${import.meta.env.VITE_SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
+          const response = await axios.post(`${SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
           return response.data;
         });
 
@@ -76,57 +77,65 @@ const DashboardPage = ({ teamDetails }) => {
   const [powercards, setPowercards] = useState(JSON.parse(localStorage.getItem("powercards")));
   const [isConnected, setIsConnected] = useState(socket.connected);
 
-  if (teamDetails) {
-    setTeam(teamDetails.teamName);
-    setSlot(teamDetails.slot);
-    setBudget(teamDetails.buget);
-    setPlayers(JSON.stringify(teamDetails.players));
-    setPowercards(JSON.stringify(teamDetails.powercards));
-  }
-
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log("connected");
-      setIsConnected(true);
-    });
+    if (teamDetails) {
+      setTeam(teamDetails.teamName);
+      setSlot(teamDetails.slot);
+      setBudget(teamDetails.buget);
+      setPlayers(teamDetails.players);
+      setPowercards(teamDetails.powercards);
+    }
+    else {
+      socket.on('connect', () => {
+        console.log("connected");
+        setIsConnected(true);
+      });
 
-    socket.on('disconnect', () => {
-      setIsConnected(false);
-    });
+      socket.on('disconnect', () => {
+        setIsConnected(false);
+      });
 
-    socket.on(`playerAdded${team}${slot}`, (data) => {
-      console.log(data);
-      const newPlayerId = data.payload._id;
-      setPlayers([...players, newPlayerId]);
-      localStorage.setItem("players", JSON.stringify(players));
-    })
+      socket.on(`playerAdded${team}${slot}`, (data) => {
+        console.log(data);
+        const newPlayerId = data.payload._id;
+        setPlayers(prevPlayers => {
+          const updatedPlayers = [...prevPlayers, newPlayerId];
+          localStorage.setItem("players", JSON.stringify(updatedPlayers));
+          return updatedPlayers;
+        });
+      })
 
-    socket.on(`playerDeleted${team}${slot}`, (data) => {
-      console.log(data);
-      const newPlayerId = data.payload._id;
-      const playerIndex = players.indexOf(newPlayerId);
+      socket.on(`playerDeleted${team}${slot}`, (data) => {
+        console.log(data);
+        const newPlayerId = data.payload._id;
+        setPlayers(prevPlayers => {
+          const playerIndex = prevPlayers.indexOf(newPlayerId);
 
-      if (playerIndex !== -1) {
-        const updatedPlayers = [...players.slice(0, playerIndex), ...players.slice(playerIndex + 1)];
-        setPlayers(updatedPlayers);
-        localStorage.setItem("players", JSON.stringify(updatedPlayers));
-      }
-    })
+          if (playerIndex !== -1) {
+            const updatedPlayers = [...prevPlayers.slice(0, playerIndex), ...prevPlayers.slice(playerIndex + 1)];
+            localStorage.setItem("players", JSON.stringify(updatedPlayers));
+            return updatedPlayers;
+          }
 
-    socket.on(`powercardAdded${team}${slot}`, (data) => {
-      console.log(data);
-    })
+          return prevPlayers;
+        });
+      })
 
-    socket.on(`teamAllocate${username}${slot}`, (data) => {
-      console.log(data);
-    })
+      socket.on(`powercardAdded${team}${slot}`, (data) => {
+        console.log(data);
+      })
+
+      socket.on(`teamAllocate${username}${slot}`, (data) => {
+        console.log(data);
+      })
+    }
 
     return () => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, [setPlayers, username, team, slot, players]);
+  }, [username, team, slot, teamDetails]);
 
   return (
     <div className="dashboard-container">
@@ -149,7 +158,7 @@ const DashboardPage = ({ teamDetails }) => {
         <div className="flex flex-col items-center">
           <p className="powercard-text">POWERCARDS</p>
           <div className="powerupcard-container">
-            {powercards.map(({ name, isUsed }, index) => (<Powercard key={index} name={name} isUsed={isUsed} />))}
+            {powercards.map(({ name, isUsed, _id }) => (<Powercard key={_id} name={name} isUsed={isUsed} />))}
           </div>
         </div>
       </div>
