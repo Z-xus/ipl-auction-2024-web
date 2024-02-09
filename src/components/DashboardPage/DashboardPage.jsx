@@ -78,39 +78,67 @@ const DashboardPage = ({ teamDetails }) => {
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
+    // useEffect is too much pain
+    socket.on('connect', () => {
+      console.log("connected");
+      setIsConnected(true);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+    });
+
     if (teamDetails) {
       setTeam(teamDetails.teamName);
-      setSlot(teamDetails.slot);
       setBudget(teamDetails.buget);
       setPlayers(teamDetails.players);
       setPowercards(teamDetails.powercards);
     }
     else {
-      socket.on('connect', () => {
-        console.log("connected");
-        setIsConnected(true);
-      });
-
-      socket.on('disconnect', () => {
-        setIsConnected(false);
-      });
-
       socket.on(`playerAdded${team}${slot}`, (data) => {
-        console.log(data);
         const newPlayerId = data.payload._id;
+        const tempPlayers = JSON.parse(localStorage.getItem("players"));
+
         setPlayers(prevPlayers => {
-          const updatedPlayers = [...prevPlayers, newPlayerId];
-          localStorage.setItem("players", JSON.stringify(updatedPlayers));
-          return updatedPlayers;
+          if (JSON.stringify(prevPlayers) != JSON.stringify(tempPlayers)) {
+            // We are on Spectate Page, Don't update display
+            const playerIndex = tempPlayers.indexOf(newPlayerId);
+            if (playerIndex === -1) {
+              const updatedPlayers = [...tempPlayers, newPlayerId];
+              localStorage.setItem("players", JSON.stringify(updatedPlayers));
+            }
+            return prevPlayers;
+          }
+
+          // Return updated players list
+          const playerIndex = prevPlayers.indexOf(newPlayerId);
+          if (playerIndex === -1) {
+            const updatedPlayers = [...prevPlayers, newPlayerId];
+            localStorage.setItem("players", JSON.stringify(updatedPlayers));
+            return updatedPlayers;
+          }
+
+          return prevPlayers
         });
       })
 
       socket.on(`playerDeleted${team}${slot}`, (data) => {
-        console.log(data);
         const newPlayerId = data.payload._id;
-        setPlayers(prevPlayers => {
-          const playerIndex = prevPlayers.indexOf(newPlayerId);
+        const tempPlayers = JSON.parse(localStorage.getItem("players"));
 
+        setPlayers(prevPlayers => {
+          if (JSON.stringify(prevPlayers) != JSON.stringify(tempPlayers)) {
+            // We are on Spectate Page, Don't update display
+            const playerIndex = tempPlayers.indexOf(newPlayerId);
+            if (playerIndex !== -1) {
+              const updatedPlayers = [...tempPlayers.slice(0, playerIndex), ...tempPlayers.slice(playerIndex + 1)];
+              localStorage.setItem("players", JSON.stringify(updatedPlayers));
+            }
+            return prevPlayers;
+          }
+
+          // Return updated players list
+          const playerIndex = prevPlayers.indexOf(newPlayerId);
           if (playerIndex !== -1) {
             const updatedPlayers = [...prevPlayers.slice(0, playerIndex), ...prevPlayers.slice(playerIndex + 1)];
             localStorage.setItem("players", JSON.stringify(updatedPlayers));
