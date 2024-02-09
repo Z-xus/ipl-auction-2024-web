@@ -170,6 +170,11 @@ const DashboardPage = ({ teamDetails }) => {
       socket.on(`teamAllocate${username}${slot}`, (data) => {
         console.log(data);
       })
+
+      socket.on(`usePowerCard${team}${slot}`,(data)=>{
+        console.log(data);
+      })
+
     }
 
     return () => {
