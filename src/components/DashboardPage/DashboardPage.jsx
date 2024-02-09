@@ -149,7 +149,7 @@ const DashboardPage = ({ teamDetails }) => {
         });
       })
 
-      socket.on(`powercardAdded${team}${slot}`, (data) => {
+      const handlePowercard = (data) => {
         const updatedPowercards = data.payload;
 
         setPowercards(prevPowercards => {
@@ -165,16 +165,23 @@ const DashboardPage = ({ teamDetails }) => {
           localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
           return updatedPowercards;
         });
+      }
+
+      socket.on(`powercardAdded${team}${slot}`, (data) => {
+        handlePowercard(data);
+      })
+
+      socket.on(`usePowerCard${team}${slot}`, (data) => {
+        handlePowercard(data)
       })
 
       socket.on(`teamAllocate${username}${slot}`, (data) => {
-        console.log(data);
+        const teamData = data.payload
+        setTeam(teamData.teamName);
+        localStorage.setItem("team", teamData.teamName)
+        setBudget(teamData.buget);
+        localStorage.setItem("budget", teamData.buget)
       })
-
-      socket.on(`usePowerCard${team}${slot}`,(data)=>{
-        console.log(data);
-      })
-
     }
 
     return () => {
