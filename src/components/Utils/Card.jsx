@@ -19,7 +19,6 @@ const Card = ({ data }) => {
   const handleOnDrag = (e) => {
     // if (!isDraggable) e.preventDefault(); // FIXME : cant stop dragging even after being put in placeholder.
     e.dataTransfer.setData("Card", JSON.stringify(data));
-    console.log("ok.")
   };
 
   return (
