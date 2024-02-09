@@ -21,22 +21,13 @@ const CalculatorPage = () => {
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
 
-    const getInitialPlayerCounts = (cards) => {
-        const counts = {};
-        cards.forEach(card => {
-            counts[card.playerName] = (card.type === "All-Rounder") ? 4 : 2;
-        });
-        return counts;
-    };
-
-    // const [playerCounts, setPlayerCounts] = useState(getInitialPlayerCounts(playerCards));
 
     // Initially set all card counts. Each count represents the number of times a player can be selected.
     useEffect(() => {
         // Initialize counts for player cards
         const updatedPlayerCards = playerData.map(player => ({
             ...player,
-            count: (player.type === "All-Rounder") ? 4 : 2
+            count: (player.type === "All-Rounder") ? 4-1 : 2-1
         }));
         setavailablePlayers(updatedPlayerCards);
     }, []);
@@ -65,6 +56,26 @@ const CalculatorPage = () => {
         return prop;
     };
 
+    const addBonusPoints = () => {  
+        // Add bonus points if playerCards[] has two players with the same playerChemestry and they are not same players.
+        let bonusPoints = 0;
+        const selectedProp = getStatProperty();
+        let playerChemestry = 0;
+        let playerChemestryCount = 0;
+        let playerChemestryPlayers = [];
+        playerCards.forEach((player) => {
+            if (player.selectedProps && player.selectedProps.includes(selectedProp)) {
+                playerChemestry = player.playerChemestry;
+                playerChemestryCount++;
+                playerChemestryPlayers.push(player);
+            }
+        }); 
+        if (playerChemestryCount === 2 && playerChemestryPlayers[0].playerName !== playerChemestryPlayers[1].playerName) {
+            bonusPoints += 5;
+        }
+        return bonusPoints;
+    };
+
     const calculateAndUpdatePoints = (data) => {
         // Decrease the count for the player whose points are updated
         setavailablePlayers(prevPlayers => prevPlayers.map(player => {
@@ -73,12 +84,23 @@ const CalculatorPage = () => {
             }
             return player;
         }));
-        data.selectedProp = getStatProperty();
-        handleSetPoints(data[data.selectedProp]);
+
+        // Get the current selected property
+        const selectedProp = getStatProperty();
+
+        // Update points based on the selected property
+        handleSetPoints(data[selectedProp] + addBonusPoints());
+
+        // Create the selectedProps array if it doesn't exist
+        if (!data.selectedProps) {
+            data.selectedProps = [];
+        }
+
+        // Push the current selectedProp to the array
+        data.selectedProps.push(selectedProp);
     };
 
     const handleOnDrop = (e) => {
-        // e.preventDefault();
         let _data = e.dataTransfer.getData("Card");
 
         if (selectedBox === null || selectedRadioBox === null) {
@@ -101,8 +123,7 @@ const CalculatorPage = () => {
             e.preventDefault();
             return;
         }
-        if (_data.count <= 0) {
-            // alert("Player count exceeded.");
+        if (_data.count === 0) {
             e.preventDefault();
             setavailablePlayers(prevPlayers => prevPlayers.filter(
                 player => player.playerName !== _data.playerName
@@ -111,30 +132,23 @@ const CalculatorPage = () => {
             return;
         }
 
-        // if (playerCards.some(data => data.playerName === _data.playerName)) {
-        //     alert(`Player already selected.`);
-        //     e.preventDefault();
-        //     return;
-        // }
-
         calculateAndUpdatePoints(_data);
-
-        console.log("Count of " + _data.playerName + ": " + _data.count);
-
+        // console.log("Count of " + _data.playerName + ": " + _data.count);
         setPlayerCards([...playerCards, _data]);
 
     };
 
     const handleClearCards = () => {
-        const updatedPlayerCards = availablePlayers.map(player => ({
+        // Reset values.
+        const updatedPlayerCards = playerData.map(player => ({
             ...player,
             count: (player.type === "All-Rounder") ? 4 : 2
         }));
-        // remove all cards from playerCards[] and put all into availablePlayers[]
         setSelectedBox(null);
         setSelectedRadioBox(null);
         setPoints(0);
-        setavailablePlayers(playerData);
+        // remove all cards from playerCards[] and put all into availablePlayers[]
+        setavailablePlayers(updatedPlayerCards);
         setPlayerCards([]);
 
     };
@@ -187,7 +201,7 @@ const CalculatorPage = () => {
             >
                 {!playerCards.length && <span className="placeholder-text text-xl mx-4 flex">Drop your cards here!</span>}
                 {
-                    playerCards.filter(data => data.selectedProp === getStatProperty())
+                    playerCards.filter(data => data.selectedProps && data.selectedProps.includes(getStatProperty()))
                         .map((data, index) => (
                             <Card key={index} data={data} />
                         ))
