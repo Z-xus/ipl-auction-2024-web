@@ -40,7 +40,7 @@ const LoginPage = () => {
       localStorage.setItem("username", data.user.username);
       localStorage.setItem("team", data.user.teamName);
       localStorage.setItem("slot", data.user.slot);
-      localStorage.setItem("budget", data.user.buget);
+      localStorage.setItem("budget", data.user.budget);
       localStorage.setItem("players", JSON.stringify(data.user.players));
       localStorage.setItem("powercards", JSON.stringify(data.user.powercards));
       navigate("/dashboard");

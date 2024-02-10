@@ -90,7 +90,7 @@ const DashboardPage = ({ teamDetails }) => {
 
     if (teamDetails) {
       setTeam(teamDetails.teamName);
-      setBudget(teamDetails.buget);
+      setBudget(teamDetails.budget);
       setPlayers(teamDetails.players);
       setPowercards(teamDetails.powercards);
     }
@@ -179,8 +179,8 @@ const DashboardPage = ({ teamDetails }) => {
         const teamData = data.payload
         setTeam(teamData.teamName);
         localStorage.setItem("team", teamData.teamName)
-        setBudget(teamData.buget);
-        localStorage.setItem("budget", teamData.buget)
+        setBudget(teamData.budget);
+        localStorage.setItem("budget", teamData.budget)
       })
     }
 
