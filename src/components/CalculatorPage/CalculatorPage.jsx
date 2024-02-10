@@ -12,6 +12,8 @@ import './CalculatorPage.css';
 // TODO4: Add one player to multiple stats logic. ✅
 // TODO5: Add legendary player logic. ❓
 // TODO6: make selectedProp an array of strings to store multiple stats for a player. ✅
+// TODO7: Add overall rating for each player. ✅
+// TODO8: Make player card to be added in only one box. ✅
 
 const CalculatorPage = () => {
 
@@ -23,14 +25,14 @@ const CalculatorPage = () => {
 
     const [showScoreboard, setShowScoreboard] = useState(false);
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
-    const [conditionsTitle, setConditionsboardTitle] = useState('');
+    // const [conditionsTitle, setConditionsboardTitle] = useState('');
 
     // Initially set all card counts. Each count represents the number of times a player can be selected.
     useEffect(() => {
         // Initialize counts for player cards
         const updatedPlayerCards = playerData.map(player => ({
             ...player,
-            count: (player.type === "All-Rounder") ? 4 : 2 
+            count: (player.type === "All-Rounder") ? 4 : 2
         }));
         setavailablePlayers(updatedPlayerCards);
     }, []);
@@ -59,25 +61,34 @@ const CalculatorPage = () => {
         return prop;
     };
 
+    // const addBonusPoints = () => {
+    //     // Add bonus points if playerCards[] has two players with the same playerChemestry and they are not same players.
+    //     let bonusPoints = 0;
+    //     const selectedProp = getStatProperty();
+    //     let playerChemestry = 0;
+    //     let playerChemestryCount = 0;
+    //     let playerChemestryPlayers = [];
+    //     playerCards.forEach((player) => {
+    //         if (player.selectedProps && player.selectedProps.includes(selectedProp)) {
+    //             playerChemestry = player.playerChemestry;
+    //             playerChemestryCount++;
+    //             playerChemestryPlayers.push(player);
+    //         }
+    //     });
+    //     if (playerChemestryCount === 2 && playerChemestryPlayers[0].playerName !== playerChemestryPlayers[1].playerName) {
+    //         bonusPoints += 5;
+    //     }
+    //     return bonusPoints;
+    // };
+    //
     const addBonusPoints = () => {
-        // Add bonus points if playerCards[] has two players with the same playerChemestry and they are not same players.
-        let bonusPoints = 0;
-        const selectedProp = getStatProperty();
-        let playerChemestry = 0;
-        let playerChemestryCount = 0;
-        let playerChemestryPlayers = [];
+        const playerChemMap = new Map();
         playerCards.forEach((player) => {
-            if (player.selectedProps && player.selectedProps.includes(selectedProp)) {
-                playerChemestry = player.playerChemestry;
-                playerChemestryCount++;
-                playerChemestryPlayers.push(player);
-            }
+            playerChemMap.set(player.playerName, player.playerChemestry);
         });
-        if (playerChemestryCount === 2 && playerChemestryPlayers[0].playerName !== playerChemestryPlayers[1].playerName) {
-            bonusPoints += 5;
-        }
-        return bonusPoints;
+
     };
+
 
     // Function to validate all conditions and generate a message
     const validateAllConditions = () => {
@@ -120,7 +131,7 @@ const CalculatorPage = () => {
             const count = counts[type];
             const conditionMet = count >= min && count <= max;
             const status = conditionMet ? '✅' : '❌';
-            message.push(`${type}: (${count}/${min}-${max}) ${status}`);
+            message.push(`${type}: ${min} ${max} ${count} ${status}`);
             if (!conditionMet) {
                 allConditionsMet = false;
             }
@@ -133,12 +144,28 @@ const CalculatorPage = () => {
         // Decrease the count for the player whose points are updated
         setavailablePlayers(prevPlayers => prevPlayers.map(player => {
             if (player.playerName === data.playerName) {
-                return { ...player, count: player.count - 1 };
+                const updatedCount = player.count - 1;
+                if (updatedCount === 0) {
+                    return null;
+                } else {
+                    return { ...player, count: updatedCount };
+                }
             }
             return player;
-        }));
+        }).filter(Boolean)); // Filter out null values to remove the dropped card
 
-        // function to validate players: have minimum 2 batsman, 2 bowlers, 2 all-rounder, 1 wicket_keeper, 1 women, 1 underdog, 1 legendary and maxiumum 4 batsman, 4 bowlers, 3 all_rounders, 1 wicket_keeper, 4 foreign, 1 woman, 1 underdog, 1 legendary
+        // Check if player is already selected in playerCards[]
+        playerCards.forEach(player => {
+            if (player.playerName === data.playerName) {
+                // console.log("Player already exists in playerCards[]");
+            }
+        });
+
+        // Check if player is being added to playerCards[] for the first time
+        if (!playerCards.some(player => player.playerName === data.playerName)) {
+            // console.log("Player being added for the first time");
+            handleSetPoints(data.overall)
+        }
 
         // Get the current selected property
         const selectedProp = getStatProperty();
@@ -151,9 +178,15 @@ const CalculatorPage = () => {
             data.selectedProps = [];
         }
 
-        // Push the current selectedProp to the array
-        data.selectedProps.push(selectedProp);
+        // Push the current selectedProp to the array if it's not already added
+        if (!data.selectedProps.includes(selectedProp)) {
+            data.selectedProps.push(selectedProp);
+        }
+
+        // console.log("Data: " + JSON.stringify(data));
+        // console.log("selectedProps" + JSON.stringify(data.selectedProps));
     };
+
 
     const handleOnDrop = (e) => {
         let _data = e.dataTransfer.getData("Card");
@@ -166,18 +199,23 @@ const CalculatorPage = () => {
 
         _data = JSON.parse(_data);
 
-        // Check if card already exists in the placeholder.
-        if (playerCards.some(data => {
-            if (data.playerName === _data.playerName && data.selectedProp === getStatProperty()) {
-                let selStat = data.selectedProp.substring(0, 3) + ' ' + data.selectedProp.substring(4);
+        // Iterate over playerCards[] to check if the playerCard to be dropped has the same selectedProp.
+        // If yes, then alert the user and prevent the drop.
+        let playerExists = false;
+        playerCards.forEach(player => {
+            if (player.playerName === _data.playerName && player.selectedProps[0] === getStatProperty()) {
+                let selStat = player.selectedProps[0].substring(0, 3) + ' ' + player.selectedProps[0].substring(4);
                 alert(`Player already selected in stat ${selStat}`);
-                return true; // Player already exists
+                e.preventDefault();
+                playerExists = true;
             }
-            return false;
-        })) {
-            e.preventDefault();
+            console.log("Player: " + player.playerName + " selectedProp: " + player.selectedProps[0]);
+        });
+        if (playerExists) {
+            // _data.count++;
             return;
         }
+
         if (_data.count === 0) {
             e.preventDefault();
             setavailablePlayers(prevPlayers => prevPlayers.filter(
@@ -188,7 +226,8 @@ const CalculatorPage = () => {
         }
 
         calculateAndUpdatePoints(_data);
-        // console.log("Count of " + _data.playerName + ": " + _data.count);
+
+        console.log("Count of " + _data.playerName + ": " + _data.count);
         setPlayerCards([...playerCards, _data]);
 
     };
@@ -213,7 +252,7 @@ const CalculatorPage = () => {
         const { message, allConditionsMet } = validateAllConditions();
         setShowScoreboard(true);
         setConditionsBoardMessage(message);
-        setConditionsboardTitle(allConditionsMet ? "All Conditions Met" : "Conditions Not Met");
+        // setConditionsboardTitle(allConditionsMet ? "All Conditions Met" : "Conditions Not Met");
     };
 
     const handleDragOver = (e) => {
@@ -236,8 +275,11 @@ const CalculatorPage = () => {
         <div className="calculator">
             <Navbar />
             {/* TODO: Submit total pts to api when user presses confirm btn */}
+
             {showPopup && <Popup message={`Are you sure? Your total points are ${points}`} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
-            {showScoreboard && <ConditionsBoard message={conditionsBoardMessage} title={conditionsTitle} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
+
+            {showScoreboard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
+
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">
                     Total Points: {points}
