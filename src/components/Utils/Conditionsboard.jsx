@@ -33,7 +33,7 @@ const ConditionsBoard = ({ message, onCancel, onConfirm }) => (
         </table>
         <div className="flex items-center justify-around mt-1">
           <button onClick={onCancel} className=" text-xl mt-4 px-3 py-1 rounded bg-gray-100 text-sky-700 hover:bg-gray-200 border-none cursor-pointer"> Back </button>
-          <button onClick={onConfirm} className="text-xl mt-4 px-3 py-1 rounded bg-gray-100 text-sky-700 hover:bg-gray-200 border-none cursor-pointer"> Ok </button>
+          <button onClick={onConfirm} className="text-xl mt-4 px-3 py-1 rounded bg-gray-100 text-sky-700 hover:bg-gray-200 border-none cursor-pointer"> Confirm </button>
         </div>
       </div>
     </div>

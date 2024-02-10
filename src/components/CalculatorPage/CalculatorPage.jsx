@@ -5,23 +5,23 @@ import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
 import playerData from './assets/player';
 import './CalculatorPage.css';
 
-// TODO: revamp logic for calculating points. ✅
-// TODO1: Add player Chemestry logic. 🔃
-// TODO2: Add player underdog logic. 🔃
-// TODO3: Add min-max no of players logic. ✅
-// TODO4: Add one player to multiple stats logic. ✅
-// TODO5: Add legendary player logic. ❓
-// TODO6: make selectedProp an array of strings to store multiple stats for a player. ✅
-// TODO7: Add overall rating for each player. ✅
-// TODO8: Make player card to be added in only one box. ✅
+// TODO1: Add player underdog logic. 🔃
+// TODO2: Add legendary player logic. ❓
+// TODO3: Add captaincy points. ❌
+// TODO4: Sum bonus logic (90%/80%/70%). ❌
+// TODO5: Add penalty points. ❌
+
 
 const CalculatorPage = () => {
 
     const [points, setPoints] = useState(0);
+    const [bonusPoints, setBonusPoints] = useState(0);
+    const [penaltyPoints, setPenaltyPoints] = useState(0);
     const [playerCards, setPlayerCards] = useState([]);
     const [availablePlayers, setavailablePlayers] = useState(playerData);
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
+    const [errMessage, setErrMessage] = useState("");
 
     const [showScoreboard, setShowScoreboard] = useState(false);
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
@@ -61,37 +61,48 @@ const CalculatorPage = () => {
         return prop;
     };
 
-    // const addBonusPoints = () => {
-    //     // Add bonus points if playerCards[] has two players with the same playerChemestry and they are not same players.
-    //     let bonusPoints = 0;
-    //     const selectedProp = getStatProperty();
-    //     let playerChemestry = 0;
-    //     let playerChemestryCount = 0;
-    //     let playerChemestryPlayers = [];
-    //     playerCards.forEach((player) => {
-    //         if (player.selectedProps && player.selectedProps.includes(selectedProp)) {
-    //             playerChemestry = player.playerChemestry;
-    //             playerChemestryCount++;
-    //             playerChemestryPlayers.push(player);
-    //         }
-    //     });
-    //     if (playerChemestryCount === 2 && playerChemestryPlayers[0].playerName !== playerChemestryPlayers[1].playerName) {
-    //         bonusPoints += 5;
-    //     }
-    //     return bonusPoints;
-    // };
-    //
     const addBonusPoints = () => {
+        let bonusPoints = 0;
+        const ChemistryPoints = 5;
+        const LegendaryPoints = 10;
+        const UnderdogPoints = 5;
+
+        // player chemistry logic
         const playerChemMap = new Map();
+        const duplicates = [];
         playerCards.forEach((player) => {
-            playerChemMap.set(player.playerName, player.playerChemestry);
+            playerChemMap.set(player.playerName, player.playerChemistry);
         });
 
+        playerCards.forEach((player) => {
+            const playerName = player.playerName;
+            const playerChemistry = player.playerChemistry;
+
+            if (playerChemMap.has(playerChemistry))
+                duplicates.push(playerChemistry);
+            else
+                playerChemMap.set(playerChemistry, playerName);
+
+        });
+
+        // bonusPoints += duplicates.length * ChemistryPoints;
+
+        // legendary player logic
+        const legendaryPlayers = playerCards.filter(player => player.gender === 'legendary');
+        console.log("Legendary players: ", legendaryPlayers.length);
+        // bonusPoints += legendaryPlayers.length * LegendaryPoints;
+
+        // underdog player logic
+        const underdogPlayers = playerCards.filter(player => player.type === 'underdog');
+        console.log("Underdog players: ", underdogPlayers.length);
+        // bonusPoints += underdogPlayers.length * UnderdogPoints;
+
+        setBonusPoints(bonusPoints);
     };
 
 
     // Function to validate all conditions and generate a message
-    const validateAllConditions = () => {
+    const validatePlayerConditions = () => {
         const counts = {
             batsman: 0,
             bowler: 0,
@@ -171,7 +182,7 @@ const CalculatorPage = () => {
         const selectedProp = getStatProperty();
 
         // Update points based on the selected property
-        handleSetPoints(data[selectedProp] + addBonusPoints());
+        handleSetPoints(data[selectedProp]);
 
         // Create the selectedProps array if it doesn't exist
         if (!data.selectedProps) {
@@ -192,7 +203,9 @@ const CalculatorPage = () => {
         let _data = e.dataTransfer.getData("Card");
 
         if (selectedBox === null || selectedRadioBox === null) {
-            alert("Please select Bat/Bowl and Ppl/Mo/Dth."); // use a toast message for this.
+            // alert("Please select Bat/Bowl and Ppl/Mo/Dth."); // use a toast message for this.
+            setErrMessage("Please select Bat/Bowl and Ppl/Mo/Dth.");
+            setErrShowPopup(true);
             e.preventDefault();
             return;
         }
@@ -205,16 +218,16 @@ const CalculatorPage = () => {
         playerCards.forEach(player => {
             if (player.playerName === _data.playerName && player.selectedProps[0] === getStatProperty()) {
                 let selStat = player.selectedProps[0].substring(0, 3) + ' ' + player.selectedProps[0].substring(4);
-                alert(`Player already selected in stat ${selStat}`);
+                // alert(`Player already selected in stat ${selStat}`);
+                setErrMessage(`Player already selected in stat ${selStat}`);
+                setErrShowPopup(true);
                 e.preventDefault();
                 playerExists = true;
             }
-            console.log("Player: " + player.playerName + " selectedProp: " + player.selectedProps[0]);
         });
-        if (playerExists) {
-            // _data.count++;
-            return;
-        }
+        if (playerExists) 
+            return; // _data.count++;
+        
 
         if (_data.count === 0) {
             e.preventDefault();
@@ -233,7 +246,6 @@ const CalculatorPage = () => {
     };
 
     const handleClearCards = () => {
-        console.log(playerCards);
         // Reset values.
         const updatedPlayerCards = playerData.map(player => ({
             ...player,
@@ -249,10 +261,12 @@ const CalculatorPage = () => {
     };
 
     const handleSubmit = () => {
-        const { message, allConditionsMet } = validateAllConditions();
+        addBonusPoints();
+        const { message, allConditionsMet } = validatePlayerConditions();
         setShowScoreboard(true);
         setConditionsBoardMessage(message);
-        // setConditionsboardTitle(allConditionsMet ? "All Conditions Met" : "Conditions Not Met");
+        let msg = allConditionsMet ? "All Conditions Met" : "Conditions Not Met";
+        console.log(msg);
     };
 
     const handleDragOver = (e) => {
@@ -261,13 +275,18 @@ const CalculatorPage = () => {
 
     // Popup logic.
     const [showPopup, setShowPopup] = useState(false);
+    const [showErrPopup, setErrShowPopup] = useState(false);
     // const handleShowPopup = () => {setShowPopup(true);};
     const handleClosePopup = () => {
         setShowPopup(false);
     };
+    const handleCloseErrPopup = () => {
+        setErrShowPopup(false);
+    };
 
     const handleCloseConditionsboard = () => {
         setShowScoreboard(false);
+        setShowPopup(true);
     };
 
 
@@ -275,8 +294,9 @@ const CalculatorPage = () => {
         <div className="calculator">
             <Navbar />
             {/* TODO: Submit total pts to api when user presses confirm btn */}
+            {showErrPopup && <Popup message={errMessage} isOK={true} onCancel={null} onConfirm={handleCloseErrPopup} />}
 
-            {showPopup && <Popup message={`Are you sure? Your total points are ${points}`} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
+            {showPopup && <Popup message={`Are you sure? Your total points are ${points}`} isOK={false} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
 
             {showScoreboard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
 
@@ -288,16 +308,32 @@ const CalculatorPage = () => {
                     // <h1 className="font-bold uppercase underline text-4xl inline">Calculator</h1>
                 }
                 <div className="btns flex flex-row gap-3">
-                    <RadioBox id={1} label="Bat" isSelected={selectedRadioBox === 1} onSelect={handleRadioBoxSelect} />
-                    <RadioBox id={2} label="Bowl" isSelected={selectedRadioBox === 2} onSelect={handleRadioBoxSelect} />
+                    <RadioBox id={1} label="Batting" isSelected={selectedRadioBox === 1} onSelect={handleRadioBoxSelect} />
+                    <RadioBox id={2} label="Bowling" isSelected={selectedRadioBox === 2} onSelect={handleRadioBoxSelect} />
                     <Button text={"Clear"} event={handleClearCards} />
                     <Button text={"Submit"} event={handleSubmit} />
                 </div>
             </div>
             <div className="drag-in-container flex justify-evenly">
-                <Box id={1} label="PPL:" isSelected={selectedBox === 1} onSelect={handleBoxSelect} />
-                <Box id={2} label="MO:" isSelected={selectedBox === 2} onSelect={handleBoxSelect} />
-                <Box id={3} label="DTH:" isSelected={selectedBox === 3} onSelect={handleBoxSelect} />
+                <Box
+                    id={1}
+                    label={`Power Play ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
+                    isSelected={selectedBox === 1}
+                    onSelect={handleBoxSelect}
+                />
+                <Box
+                    id={2}
+                    label={`Mid Over ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
+                    isSelected={selectedBox === 2}
+                    onSelect={handleBoxSelect}
+                />
+                <Box
+                    id={3}
+                    label={`Death Over ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
+                    isSelected={selectedBox === 3}
+                    onSelect={handleBoxSelect}
+                />
+
             </div>
             <div className="card-placeholder h-[11.7rem] flex justify-center items-center my-7"
                 onDrop={handleOnDrop} onDragOver={handleDragOver}
