@@ -1,17 +1,17 @@
 // import React from 'react';
 import { useEffect, useState } from 'react';
-import { Navbar, Card, Popup } from '../Utils';
+import { Navbar, Card, Popup, ConditionsBoard } from '../Utils';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
 import playerData from './assets/player';
 import './CalculatorPage.css';
 
-// TODO: revamp logic for calculating points.
-// TODO1: Add player Chemestry logic.
-// TODO2: Add player underdog logic.
-// TODO3: Add min-max no of players logic.
-// TODO4: Add one player to multiple stats logic.
-// TODO5: Add legendary player logic.
-// TODO6: make selectedProp an array of strings to store multiple stats for a player.
+// TODO: revamp logic for calculating points. ✅
+// TODO1: Add player Chemestry logic. 🔃
+// TODO2: Add player underdog logic. 🔃
+// TODO3: Add min-max no of players logic. ✅
+// TODO4: Add one player to multiple stats logic. ✅
+// TODO5: Add legendary player logic. ❓
+// TODO6: make selectedProp an array of strings to store multiple stats for a player. ✅
 
 const CalculatorPage = () => {
 
@@ -21,13 +21,16 @@ const CalculatorPage = () => {
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
 
+    const [showScoreboard, setShowScoreboard] = useState(false);
+    const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
+    const [conditionsTitle, setConditionsboardTitle] = useState('');
 
     // Initially set all card counts. Each count represents the number of times a player can be selected.
     useEffect(() => {
         // Initialize counts for player cards
         const updatedPlayerCards = playerData.map(player => ({
             ...player,
-            count: (player.type === "All-Rounder") ? 4-1 : 2-1
+            count: (player.type === "All-Rounder") ? 4 : 2 
         }));
         setavailablePlayers(updatedPlayerCards);
     }, []);
@@ -56,7 +59,7 @@ const CalculatorPage = () => {
         return prop;
     };
 
-    const addBonusPoints = () => {  
+    const addBonusPoints = () => {
         // Add bonus points if playerCards[] has two players with the same playerChemestry and they are not same players.
         let bonusPoints = 0;
         const selectedProp = getStatProperty();
@@ -69,11 +72,61 @@ const CalculatorPage = () => {
                 playerChemestryCount++;
                 playerChemestryPlayers.push(player);
             }
-        }); 
+        });
         if (playerChemestryCount === 2 && playerChemestryPlayers[0].playerName !== playerChemestryPlayers[1].playerName) {
             bonusPoints += 5;
         }
         return bonusPoints;
+    };
+
+    // Function to validate all conditions and generate a message
+    const validateAllConditions = () => {
+        const counts = {
+            batsman: 0,
+            bowler: 0,
+            all_rounder: 0,
+            wicket_keeper: 0,
+            foreign: 0,
+            women: 0,
+            underdogs: 0,
+            legendary: 0
+        };
+
+        playerCards.forEach(card => {
+            counts[card.type]++;
+            if (card.gender === 'female') {
+                counts['women']++;
+            }
+            if (card.gender === 'legendary') {
+                counts['legendary']++;
+            }
+        });
+
+        const conditions = {
+            batsman: { min: 2, max: 4 },
+            bowler: { min: 2, max: 4 },
+            all_rounder: { min: 2, max: 3 },
+            wicket_keeper: { min: 1, max: 1 },
+            foreign: { min: 0, max: 4 },
+            women: { min: 1, max: 1 },
+            underdogs: { min: 1, max: 1 },
+            legendary: { min: 1, max: 1 }
+        };
+
+        let message = [];
+        let allConditionsMet = true;
+        for (const type in conditions) {
+            const { min, max } = conditions[type];
+            const count = counts[type];
+            const conditionMet = count >= min && count <= max;
+            const status = conditionMet ? '✅' : '❌';
+            message.push(`${type}: (${count}/${min}-${max}) ${status}`);
+            if (!conditionMet) {
+                allConditionsMet = false;
+            }
+        }
+
+        return { message, allConditionsMet };
     };
 
     const calculateAndUpdatePoints = (data) => {
@@ -84,6 +137,8 @@ const CalculatorPage = () => {
             }
             return player;
         }));
+
+        // function to validate players: have minimum 2 batsman, 2 bowlers, 2 all-rounder, 1 wicket_keeper, 1 women, 1 underdog, 1 legendary and maxiumum 4 batsman, 4 bowlers, 3 all_rounders, 1 wicket_keeper, 4 foreign, 1 woman, 1 underdog, 1 legendary
 
         // Get the current selected property
         const selectedProp = getStatProperty();
@@ -139,6 +194,7 @@ const CalculatorPage = () => {
     };
 
     const handleClearCards = () => {
+        console.log(playerCards);
         // Reset values.
         const updatedPlayerCards = playerData.map(player => ({
             ...player,
@@ -154,8 +210,10 @@ const CalculatorPage = () => {
     };
 
     const handleSubmit = () => {
-        // make a popup confirmation.
-        handleShowPopup();
+        const { message, allConditionsMet } = validateAllConditions();
+        setShowScoreboard(true);
+        setConditionsBoardMessage(message);
+        setConditionsboardTitle(allConditionsMet ? "All Conditions Met" : "Conditions Not Met");
     };
 
     const handleDragOver = (e) => {
@@ -164,11 +222,13 @@ const CalculatorPage = () => {
 
     // Popup logic.
     const [showPopup, setShowPopup] = useState(false);
-    const handleShowPopup = () => {
-        setShowPopup(true);
-    };
+    // const handleShowPopup = () => {setShowPopup(true);};
     const handleClosePopup = () => {
         setShowPopup(false);
+    };
+
+    const handleCloseConditionsboard = () => {
+        setShowScoreboard(false);
     };
 
 
@@ -177,6 +237,7 @@ const CalculatorPage = () => {
             <Navbar />
             {/* TODO: Submit total pts to api when user presses confirm btn */}
             {showPopup && <Popup message={`Are you sure? Your total points are ${points}`} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
+            {showScoreboard && <ConditionsBoard message={conditionsBoardMessage} title={conditionsTitle} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">
                     Total Points: {points}
@@ -212,3 +273,5 @@ const CalculatorPage = () => {
     );
 };
 export default CalculatorPage;
+
+
