@@ -96,7 +96,8 @@ const DashboardPage = ({ teamDetails }) => {
     }
     else {
       socket.on(`playerAdded${team}${slot}`, (data) => {
-        const newPlayerId = data.payload._id;
+        const newPlayerId = data.payload.playerID;
+        const newBudget = data.payload.budget;
         const tempPlayers = JSON.parse(localStorage.getItem("players"));
 
         setPlayers(prevPlayers => {
@@ -106,6 +107,7 @@ const DashboardPage = ({ teamDetails }) => {
             if (playerIndex === -1) {
               const updatedPlayers = [...tempPlayers, newPlayerId];
               localStorage.setItem("players", JSON.stringify(updatedPlayers));
+              localStorage.setItem("budget", JSON.stringify(newBudget));
             }
             return prevPlayers;
           }
@@ -115,6 +117,8 @@ const DashboardPage = ({ teamDetails }) => {
           if (playerIndex === -1) {
             const updatedPlayers = [...prevPlayers, newPlayerId];
             localStorage.setItem("players", JSON.stringify(updatedPlayers));
+            setBudget(newBudget);
+            localStorage.setItem("budget", JSON.stringify(newBudget));
             return updatedPlayers;
           }
 
@@ -123,7 +127,8 @@ const DashboardPage = ({ teamDetails }) => {
       })
 
       socket.on(`playerDeleted${team}${slot}`, (data) => {
-        const newPlayerId = data.payload._id;
+        const newPlayerId = data.payload.playerID;
+        const newBudget = data.payload.budget;
         const tempPlayers = JSON.parse(localStorage.getItem("players"));
 
         setPlayers(prevPlayers => {
@@ -133,6 +138,7 @@ const DashboardPage = ({ teamDetails }) => {
             if (playerIndex !== -1) {
               const updatedPlayers = [...tempPlayers.slice(0, playerIndex), ...tempPlayers.slice(playerIndex + 1)];
               localStorage.setItem("players", JSON.stringify(updatedPlayers));
+              localStorage.setItem("budget", JSON.stringify(newBudget));
             }
             return prevPlayers;
           }
@@ -142,6 +148,8 @@ const DashboardPage = ({ teamDetails }) => {
           if (playerIndex !== -1) {
             const updatedPlayers = [...prevPlayers.slice(0, playerIndex), ...prevPlayers.slice(playerIndex + 1)];
             localStorage.setItem("players", JSON.stringify(updatedPlayers));
+            setBudget(newBudget);
+            localStorage.setItem("budget", JSON.stringify(newBudget));
             return updatedPlayers;
           }
 
