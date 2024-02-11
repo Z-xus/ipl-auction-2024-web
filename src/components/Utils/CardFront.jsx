@@ -19,13 +19,20 @@ function numberConvert(number) {
     return (sign * num).toString();
 }
 
-const CardFront = ({ playerData }) => {
+const CardFront = ({ playerData, isSelected, onSelect }) => {
+
+  const handleClick = () => {
+    if (onSelect) {
+      onSelect(playerData);
+    }
+  };
+
   return (
-    <div className='card card-front w-32 h-44 m-1 p-1.5 relative overflow-hidden'>
+    <div style={{userSelect: "none"}} className={` card card-front w-32 h-44 m-1 p-1.5 rounded-xl border-fancy-blue relative overflow-hidden ${isSelected?"shadow-lg":""}`} onClick={handleClick}>
       <img src={`/images/players/${playerData.playerName}.png`} alt={playerData.playerName} className='absolute w-full h-full object-cover' />
 
-      <div className="flex flex-col items-stretch justify-end h-full absolute bottom-0 left-0 right-0 z-10 p-2">
-        <h1 className="player-name text-left">{playerData.playerName}</h1>
+      <div className="flex flex-col rounded-xl items-stretch justify-end h-full absolute bottom-0 left-0 right-0 z-10 p-2">
+        <h1 className="player-name text-left text-white">{playerData.playerName}</h1>
 
         <div className="front-stat-container">
           <div>

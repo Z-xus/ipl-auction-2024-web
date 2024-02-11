@@ -5,11 +5,11 @@ const CardBack = ({ playerData }) => {
 
   return (
     <div className='card card-back w-32 h-44 mx-1 p-1.5'>
-      <h2 className="player-name">{playerName}</h2>
-      <div className="rounded-lg bg-white text-center shadow-md p-0.5 mx-1">
+      <p className="text-ellipsis overflow-hidden player-name">{playerName}</p>
+      <div className="rounded-md bg-white text-center shadow-md p-0.5 mx-1">
         <p className="stat-text">Overall: {overall}</p>
       </div>
-      <div className="back-stat-container">
+      <div className="back-stat-container rounded-md">
         <div className="flex flex-col text-center">
           <p className="stat-text">BAT</p>
           <p className="stat-text">{bat_ppl} PPL</p>

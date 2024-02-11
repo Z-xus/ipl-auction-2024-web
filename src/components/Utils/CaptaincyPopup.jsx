@@ -1,35 +1,62 @@
-import Card from "./Card";
-// import React from "react"; // Don't forget to import React
+import React, { useState } from "react";
+// import Card from "./Card";
+import Arrow from "../../assets/arrow.svg";
+import CardFront from "./CardFront";
 
 const CaptaincyPopup = ({ message, onCancel, onConfirm, playerCards }) => {
-  // Create a Set to store unique player names
-  const uniquePlayers = new Set();
+  const [selectedCard, setSelectedCard] = useState(null);
 
-  // Iterate through playerCards to add unique players to the Set
-  playerCards.forEach(player => {
-    uniquePlayers.add(player.playerName);
-  });
+  const handleSelectCard = (cardData) => {
+    setSelectedCard(cardData);
+  };
 
-  // Convert the Set back to an array to render unique cards
-  const uniquePlayerCards = Array.from(uniquePlayers);
+  const handleConfirm = () => {
+    if (selectedCard) {
+      onConfirm(selectedCard); // Pass the selected card data to the onConfirm function
+    } else {
+      console.log("No captain selected.");
+    }
+  };
+
+  // Filter unique cards based on playerName
+  const uniquePlayerCards = Array.from(
+    new Set(playerCards.map((player) => player.playerName))
+  ).map((playerName) =>
+    playerCards.find((player) => player.playerName === playerName)
+  );
 
   return (
     <>
       <div className="fixed top-0 left-0 w-full h-full bg-gray-800 opacity-50 z-40"></div>
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-sky-900 p-8 shadow-md z-50 rounded-lg">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent backdrop-blur-lg p-8 shadow-lg border-fancy-blue border-4 z-50 rounded-lg">
+        <h2 className="text-white text-3xl text-center mb-5 font-bold">Select Captain</h2>
         <div className="flex flex-col items-stretch">
-          <div className="flex items-center justify-around">
-            {uniquePlayerCards.map((playerName, index) => (
-              // Assuming each player card has a unique identifier (key)
-              <Card key={index} data={playerCards.find(player => player.playerName === playerName)} /> 
+          <div className="flex items-center justify-around pt-4">
+            {uniquePlayerCards.length === 0 && (
+              <p className="text-white text-2xl">No players available</p>
+            )}
+            {uniquePlayerCards.map((player, index) => (
+              <div key={index} className="z-50 relative">
+                <CardFront
+                  key={index}
+                  playerData={player}
+                  isSelected={player === selectedCard}
+                  onSelect={() => handleSelectCard(player)}
+                />
+                {player === selectedCard && (
+                  <div className="absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2">
+                    <img src={Arrow} className="w-10 h-10 relative left-16 bottom-3" alt="Arrow" />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
           <p className="text-white text-2xl">{message}</p>
           <div className="flex items-center justify-around">
-            {<button onClick={onCancel} className="mt-4 px-4 py-2 rounded bg-gray-100 text-sky-700 hover:bg-gray-200 border-none cursor-pointer">
+            {<button onClick={onCancel} className="mt-4 px-4 py-2 rounded font-bold bg-gray-100 text-indigo-700 hover:bg-gray-200 border-none cursor-pointer">
               Cancel
             </button>}
-            <button onClick={onConfirm} className="mt-4 px-4 py-2 rounded bg-gray-100 text-sky-700 hover:bg-gray-200 border-none cursor-pointer">
+            <button onClick={handleConfirm} className="mt-4 px-4 py-2 rounded font-bold bg-gray-100 text-indigo-700 hover:bg-gray-200 border-none cursor-pointer">
               OK
             </button>
           </div>

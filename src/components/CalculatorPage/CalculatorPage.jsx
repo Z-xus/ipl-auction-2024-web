@@ -5,11 +5,13 @@ import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
 import './CalculatorPage.css';
 
-// TODO1: Add player underdog logic. 🔃
-// TODO2: Add legendary player logic. ❓
-// TODO3: Add captaincy points. 🔃
+// TODO1: Add player underdog logic. ✅
+// TODO2: Add legendary player logic. ✅
+// TODO3: Add captaincy points. ✅
 // TODO4: Sum bonus logic (90%/80%/70%). ❌
 // TODO5: Add penalty points. ❌
+// TODO6: submit the points to api. ❌
+// TODO7: Add conditions min ppl, mo, dth. ❌
 
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 
@@ -23,6 +25,7 @@ const CalculatorPage = () => {
     const [playerCards, setPlayerCards] = useState([]);
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
+    const [captainName, setCaptainName] = useState(null);
     const [errMessage, setErrMessage] = useState("");
 
     const [showScoreboard, setShowScoreboard] = useState(false);
@@ -196,19 +199,14 @@ const CalculatorPage = () => {
             handleSetPoints(data.overall)
         }
 
-        // Get the current selected property
         const selectedProp = getStatProperty();
-
-        // Update points based on the selected property
         handleSetPoints(data[selectedProp]);
 
-        // Create the selectedProps array if it doesn't exist
-        if (!data.selectedProps) {
+        if (!data.selectedProps) { // Create the selectedProps array if it doesn't exist
             data.selectedProps = [];
         }
 
-        // Push the current selectedProp to the array if it's not already added
-        if (!data.selectedProps.includes(selectedProp)) {
+        if (!data.selectedProps.includes(selectedProp)) { // Push the current selectedProp to the array if it's not already added
             data.selectedProps.push(selectedProp);
         }
 
@@ -221,7 +219,6 @@ const CalculatorPage = () => {
         let _data = e.dataTransfer.getData("Card");
 
         if (selectedBox === null || selectedRadioBox === null) {
-            // alert("Please select Bat/Bowl and Ppl/Mo/Dth."); // use a toast message for this.
             setErrMessage("Please select Bat/Bowl and Ppl/Mo/Dth.");
             setErrShowPopup(true);
             e.preventDefault();
@@ -243,22 +240,11 @@ const CalculatorPage = () => {
                 playerExists = true;
             }
         });
-        if (playerExists)
-            return; // _data.count++;
-
-
-        // if (_data.count === 0) {
-        //     e.preventDefault();
-        //     setavailablePlayers(prevPlayers => prevPlayers.filter(
-        //         player => player.playerName !== _data.playerName
-        //     ));
-        //     setPlayerCards([...playerCards, _data]);
-        //     return;
-        // }
+        if (playerExists) return; // _data.count++;
 
         calculateAndUpdatePoints(_data);
 
-        console.log("Count of " + _data.playerName + ": " + _data.count);
+        // console.log("Count of " + _data.playerName + ": " + _data.count);
         setPlayerCards([...playerCards, _data]);
 
     };
@@ -311,6 +297,13 @@ const CalculatorPage = () => {
         setShowPopup(true);
     };
 
+    const handleConfirmCaptain = (player) => {
+        setCaptainName(player.playerName);
+        console.log("Captain: " + JSON.stringify(captainName));
+        // TODO: Add captain bonus points to the total points when sumbitting to the API.
+        setShowCapPopup(false);
+    };
+
 
     return (
         <div className="calculator">
@@ -322,7 +315,7 @@ const CalculatorPage = () => {
 
             {showScoreboard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
 
-            {showCapPopup && <CaptaincyPopup playerCards={playerCards} onCancel={handleCloseCapPopup} onConfirm={handleCloseCapPopup} />}
+            {showCapPopup && <CaptaincyPopup playerCards={playerCards} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
 
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">
