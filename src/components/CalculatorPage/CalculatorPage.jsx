@@ -4,10 +4,11 @@ import { Navbar, Card, Popup, ConditionsBoard } from '../Utils';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
 import playerData from './assets/player';
 import './CalculatorPage.css';
+import CaptaincyPopup from '../Utils/CaptaincyPopup.jsx';
 
 // TODO1: Add player underdog logic. 🔃
 // TODO2: Add legendary player logic. ❓
-// TODO3: Add captaincy points. ❌
+// TODO3: Add captaincy points. 🔃
 // TODO4: Sum bonus logic (90%/80%/70%). ❌
 // TODO5: Add penalty points. ❌
 
@@ -229,14 +230,14 @@ const CalculatorPage = () => {
             return; // _data.count++;
         
 
-        if (_data.count === 0) {
-            e.preventDefault();
-            setavailablePlayers(prevPlayers => prevPlayers.filter(
-                player => player.playerName !== _data.playerName
-            ));
-            setPlayerCards([...playerCards, _data]);
-            return;
-        }
+        // if (_data.count === 0) {
+        //     e.preventDefault();
+        //     setavailablePlayers(prevPlayers => prevPlayers.filter(
+        //         player => player.playerName !== _data.playerName
+        //     ));
+        //     setPlayerCards([...playerCards, _data]);
+        //     return;
+        // }
 
         calculateAndUpdatePoints(_data);
 
@@ -266,7 +267,11 @@ const CalculatorPage = () => {
         setShowScoreboard(true);
         setConditionsBoardMessage(message);
         let msg = allConditionsMet ? "All Conditions Met" : "Conditions Not Met";
-        console.log(msg);
+        console.log(msg); // TODO: do something with validation message
+    };
+
+    const handleCaptain = () => {
+        setShowCapPopup(true);
     };
 
     const handleDragOver = (e) => {
@@ -276,12 +281,16 @@ const CalculatorPage = () => {
     // Popup logic.
     const [showPopup, setShowPopup] = useState(false);
     const [showErrPopup, setErrShowPopup] = useState(false);
+    const [showCapPopup, setShowCapPopup] = useState(false);
     // const handleShowPopup = () => {setShowPopup(true);};
     const handleClosePopup = () => {
         setShowPopup(false);
     };
     const handleCloseErrPopup = () => {
         setErrShowPopup(false);
+    };
+    const handleCloseCapPopup = () => {
+        setShowCapPopup(false);
     };
 
     const handleCloseConditionsboard = () => {
@@ -300,6 +309,8 @@ const CalculatorPage = () => {
 
             {showScoreboard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
 
+            {showCapPopup && <CaptaincyPopup playerCards={playerCards} onCancel={handleCloseCapPopup} onConfirm={handleCloseCapPopup} />}
+
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">
                     Total Points: {points}
@@ -310,6 +321,7 @@ const CalculatorPage = () => {
                 <div className="btns flex flex-row gap-3">
                     <RadioBox id={1} label="Batting" isSelected={selectedRadioBox === 1} onSelect={handleRadioBoxSelect} />
                     <RadioBox id={2} label="Bowling" isSelected={selectedRadioBox === 2} onSelect={handleRadioBoxSelect} />
+                    <Button text={"Captain"} event={handleCaptain} />
                     <Button text={"Clear"} event={handleClearCards} />
                     <Button text={"Submit"} event={handleSubmit} />
                 </div>
