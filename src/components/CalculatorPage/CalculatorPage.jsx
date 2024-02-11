@@ -1,10 +1,9 @@
 // import React from 'react';
 import { useEffect, useState } from 'react';
-import { Navbar, Card, Popup, ConditionsBoard } from '../Utils';
+import axios from 'axios';
+import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
-import playerData from './assets/player';
 import './CalculatorPage.css';
-import CaptaincyPopup from '../Utils/CaptaincyPopup.jsx';
 
 // TODO1: Add player underdog logic. 🔃
 // TODO2: Add legendary player logic. ❓
@@ -12,6 +11,7 @@ import CaptaincyPopup from '../Utils/CaptaincyPopup.jsx';
 // TODO4: Sum bonus logic (90%/80%/70%). ❌
 // TODO5: Add penalty points. ❌
 
+const SERVERURL = import.meta.env.VITE_SERVERURL;
 
 const CalculatorPage = () => {
 
@@ -19,7 +19,7 @@ const CalculatorPage = () => {
     const [bonusPoints, setBonusPoints] = useState(0);
     const [penaltyPoints, setPenaltyPoints] = useState(0);
     const [playerCards, setPlayerCards] = useState([]);
-    const [availablePlayers, setavailablePlayers] = useState(playerData);
+    const [availablePlayers, setavailablePlayers] = useState([]);
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
     const [errMessage, setErrMessage] = useState("");
@@ -27,16 +27,34 @@ const CalculatorPage = () => {
     const [showScoreboard, setShowScoreboard] = useState(false);
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
     // const [conditionsTitle, setConditionsboardTitle] = useState('');
+    const playerList = JSON.parse(localStorage.getItem("players"));
 
     // Initially set all card counts. Each count represents the number of times a player can be selected.
     useEffect(() => {
+        const fetchPlayerData = async () => {
+            try {
+                const playerPromises = playerList.map(async (playerID) => {
+                    const response = await axios.post(`${SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
+                    return response.data;
+                });
+
+                const resolvedPlayers = await Promise.all(playerPromises);
+                setavailablePlayers(resolvedPlayers);
+            } catch (error) {
+                console.error('Error fetching player data:', error);
+            }
+        };
+        fetchPlayerData();
+
         // Initialize counts for player cards
-        const updatedPlayerCards = playerData.map(player => ({
-            ...player,
-            count: (player.type === "All-Rounder") ? 4 : 2
-        }));
-        setavailablePlayers(updatedPlayerCards);
-    }, []);
+        setavailablePlayers(prevAvailablePlayers => {
+            const newPlayerData = prevAvailablePlayers.map(player => ({
+                ...player,
+                count: (player.type === "All Rounder") ? 4 : 2
+            }));
+            return newPlayerData
+        });
+    }, [playerList]);
 
     const handleBoxSelect = (boxId) => {
         setSelectedBox(boxId);
@@ -105,14 +123,14 @@ const CalculatorPage = () => {
     // Function to validate all conditions and generate a message
     const validatePlayerConditions = () => {
         const counts = {
-            batsman: 0,
-            bowler: 0,
-            all_rounder: 0,
-            wicket_keeper: 0,
-            foreign: 0,
-            women: 0,
-            underdogs: 0,
-            legendary: 0
+            "Batsman": 0,
+            "Bowler": 0,
+            "All Rounder": 0,
+            "Wicket Keeper": 0,
+            "foreign": 0,
+            "women": 0,
+            "underdogs": 0,
+            "legendary": 0
         };
 
         playerCards.forEach(card => {
@@ -126,14 +144,14 @@ const CalculatorPage = () => {
         });
 
         const conditions = {
-            batsman: { min: 2, max: 4 },
-            bowler: { min: 2, max: 4 },
-            all_rounder: { min: 2, max: 3 },
-            wicket_keeper: { min: 1, max: 1 },
-            foreign: { min: 0, max: 4 },
-            women: { min: 1, max: 1 },
-            underdogs: { min: 1, max: 1 },
-            legendary: { min: 1, max: 1 }
+            "Batsman": { min: 2, max: 4 },
+            "Bowler": { min: 2, max: 4 },
+            "All Rounder": { min: 2, max: 3 },
+            "Wicket Keeper": { min: 1, max: 1 },
+            "foreign": { min: 0, max: 4 },
+            "women": { min: 1, max: 1 },
+            "underdogs": { min: 1, max: 1 },
+            "legendary": { min: 1, max: 1 }
         };
 
         let message = [];
@@ -226,9 +244,9 @@ const CalculatorPage = () => {
                 playerExists = true;
             }
         });
-        if (playerExists) 
+        if (playerExists)
             return; // _data.count++;
-        
+
 
         // if (_data.count === 0) {
         //     e.preventDefault();

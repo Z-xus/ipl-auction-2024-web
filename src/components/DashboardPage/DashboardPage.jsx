@@ -68,7 +68,7 @@ TeamPlayers.propTypes = {
 };
 
 const DashboardPage = ({ teamDetails }) => {
-  const playerTypes = ['batsman', 'bowler', 'all-rounder', 'wicket-keeper'];
+  const playerTypes = ['Batsman', 'Bowler', 'All Rounder', 'Wicket Keeper'];
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [team, setTeam] = useState(localStorage.getItem("team"));
   const [slot, setSlot] = useState(localStorage.getItem("slot"));
