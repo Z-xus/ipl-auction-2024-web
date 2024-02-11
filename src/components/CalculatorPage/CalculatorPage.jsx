@@ -19,7 +19,7 @@ const CalculatorPage = () => {
     const [bonusPoints, setBonusPoints] = useState(0);
     const [penaltyPoints, setPenaltyPoints] = useState(0);
     const [playerCards, setPlayerCards] = useState([]);
-    const [availablePlayers, setavailablePlayers] = useState([]);
+    const [availablePlayers, setAvailablePlayers] = useState([]);
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
     const [errMessage, setErrMessage] = useState("");
@@ -27,9 +27,8 @@ const CalculatorPage = () => {
     const [showScoreboard, setShowScoreboard] = useState(false);
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
     // const [conditionsTitle, setConditionsboardTitle] = useState('');
-    const playerList = JSON.parse(localStorage.getItem("players"));
+    const [playerList, setPlayerList] = useState(JSON.parse(localStorage.getItem("players")));
 
-    // Initially set all card counts. Each count represents the number of times a player can be selected.
     useEffect(() => {
         const fetchPlayerData = async () => {
             try {
@@ -39,7 +38,7 @@ const CalculatorPage = () => {
                 });
 
                 const resolvedPlayers = await Promise.all(playerPromises);
-                setavailablePlayers(resolvedPlayers);
+                setAvailablePlayers(resolvedPlayers);
             } catch (error) {
                 console.error('Error fetching player data:', error);
             }
@@ -47,12 +46,12 @@ const CalculatorPage = () => {
         fetchPlayerData();
 
         // Initialize counts for player cards
-        setavailablePlayers(prevAvailablePlayers => {
+        setAvailablePlayers(prevAvailablePlayers => {
             const newPlayerData = prevAvailablePlayers.map(player => ({
                 ...player,
                 count: (player.type === "All Rounder") ? 4 : 2
             }));
-            return newPlayerData
+            return newPlayerData;
         });
     }, [playerList]);
 
@@ -172,7 +171,7 @@ const CalculatorPage = () => {
 
     const calculateAndUpdatePoints = (data) => {
         // Decrease the count for the player whose points are updated
-        setavailablePlayers(prevPlayers => prevPlayers.map(player => {
+        setAvailablePlayers(prevPlayers => prevPlayers.map(player => {
             if (player.playerName === data.playerName) {
                 const updatedCount = player.count - 1;
                 if (updatedCount === 0) {
@@ -274,7 +273,7 @@ const CalculatorPage = () => {
         setSelectedRadioBox(null);
         setPoints(0);
         // remove all cards from playerCards[] and put all into availablePlayers[]
-        setavailablePlayers(updatedPlayerCards);
+        setAvailablePlayers(updatedPlayerCards);
         setPlayerCards([]);
 
     };
