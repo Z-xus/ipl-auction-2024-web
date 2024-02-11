@@ -3,19 +3,19 @@
   flex-direction: column;
   align-items: center;
   width: 10vw;
-  height: 13vw;
+  height: 16vw;
   cursor: pointer;
-  border: .2rem solid gray;
-  border-radius: 30px;
+  border: .2rem solid rgba(88, 130, 193, 0.49);
+  border-radius: 10px;
 }
 
 .card-front,
 .card-back {
   align-items: stretch;
-  background-image: url('/images/background/card.png');
+  background-image: url('/images/background/bg.jpg');
   background-repeat: no-repeat;
   background-size: cover;
-  border-radius: 1.5rem;
+  border-radius: 0.75rem;
 }
 
 .player-name {
@@ -23,9 +23,12 @@
   font-family: 'Economica', Verdana, Geneva, Tahoma, sans-serif;
   font-weight: 900;
   line-height: 1.4rem;
-  color: #FFF;
+  color: white;
   text-align: center;
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  background: rgb(0,21,46,1);
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
 }
 
 .front-stat-container,
@@ -36,22 +39,31 @@
   justify-content: space-between;
   background-color: white;
   border-radius: .5rem;
+  border-top-right-radius: 0px;
+  border-top-left-radius: 0px;
   text-align: center;
 }
 
 .front-stat-container {
   align-items: center;
   padding: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 .back-stat-container {
-  margin: .25rem .25rem 0 .25rem;
-  padding: .5rem;
+  margin: .20rem .20rem 0 .20rem;
+  padding: .4rem;
 }
 
 .stat-text {
   font-size: .9rem;
-  font-family: "DroidSans-Bold", Verdana, Geneva, Tahoma, sans-serif;
+  font-family: "Dosis", Verdana, Geneva, Tahoma, sans-serif;
   font-weight: 700;
   color: #1B223E;
+}
+
+/* CSS styles for the glowy border effect */
+.border-glow {
+  box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.5);
 }

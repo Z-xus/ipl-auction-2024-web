@@ -27,7 +27,7 @@ const LeaderboardItem = ({ position, name, points }) => (
 
 const LeaderboardPage = () => {
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [teamsData, setTeamsData] = useState([]);
+  const [teamsData, setTeamsData] = useState(JSON.parse(localStorage.getItem('leaderboard')));
   const slot = localStorage.getItem("slot");
 
   useEffect(() => {
@@ -58,6 +58,7 @@ const LeaderboardPage = () => {
         // If the team already exists, return the current state without modification
         return prevTeamsData;
       });
+
     });
 
 
@@ -67,6 +68,10 @@ const LeaderboardPage = () => {
       socket.off('pong');
     };
   }, [slot]);
+
+  useEffect(() => {
+    localStorage.setItem('leaderboard',JSON.stringify(teamsData))
+  },[teamsData])
 
 
   return (
