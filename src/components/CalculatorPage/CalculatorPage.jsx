@@ -18,8 +18,9 @@ const CalculatorPage = () => {
     const [points, setPoints] = useState(0);
     const [bonusPoints, setBonusPoints] = useState(0);
     const [penaltyPoints, setPenaltyPoints] = useState(0);
-    const [playerCards, setPlayerCards] = useState([]);
+    const [playerData, setPlayerData] = useState([]);
     const [availablePlayers, setAvailablePlayers] = useState([]);
+    const [playerCards, setPlayerCards] = useState([]);
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
     const [errMessage, setErrMessage] = useState("");
@@ -27,33 +28,32 @@ const CalculatorPage = () => {
     const [showScoreboard, setShowScoreboard] = useState(false);
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
     // const [conditionsTitle, setConditionsboardTitle] = useState('');
-    const [playerList, setPlayerList] = useState(JSON.parse(localStorage.getItem("players")));
+    const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")));
 
     useEffect(() => {
         const fetchPlayerData = async () => {
             try {
-                const playerPromises = playerList.map(async (playerID) => {
+                const playerPromises = players.map(async (playerID) => {
                     const response = await axios.post(`${SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
                     return response.data;
                 });
 
                 const resolvedPlayers = await Promise.all(playerPromises);
-                setAvailablePlayers(resolvedPlayers);
+
+                // Initialize counts for player cards
+                const newPlayerData = resolvedPlayers.map(player => ({
+                    ...player,
+                    count: (player.type === "All Rounder") ? 4 : 2
+                }));
+                setAvailablePlayers(newPlayerData);
+                setPlayerData(newPlayerData);
             } catch (error) {
                 console.error('Error fetching player data:', error);
             }
         };
         fetchPlayerData();
 
-        // Initialize counts for player cards
-        setAvailablePlayers(prevAvailablePlayers => {
-            const newPlayerData = prevAvailablePlayers.map(player => ({
-                ...player,
-                count: (player.type === "All Rounder") ? 4 : 2
-            }));
-            return newPlayerData;
-        });
-    }, [playerList]);
+    }, [players]);
 
     const handleBoxSelect = (boxId) => {
         setSelectedBox(boxId);
@@ -160,7 +160,7 @@ const CalculatorPage = () => {
             const count = counts[type];
             const conditionMet = count >= min && count <= max;
             const status = conditionMet ? '✅' : '❌';
-            message.push(`${type}: ${min} ${max} ${count} ${status}`);
+            message.push(`${type}:,${min},${max},${count},${status}`);
             if (!conditionMet) {
                 allConditionsMet = false;
             }
@@ -265,15 +265,11 @@ const CalculatorPage = () => {
 
     const handleClearCards = () => {
         // Reset values.
-        const updatedPlayerCards = playerData.map(player => ({
-            ...player,
-            count: (player.type === "All-Rounder") ? 4 : 2
-        }));
         setSelectedBox(null);
         setSelectedRadioBox(null);
         setPoints(0);
         // remove all cards from playerCards[] and put all into availablePlayers[]
-        setAvailablePlayers(updatedPlayerCards);
+        setAvailablePlayers(playerData);
         setPlayerCards([]);
 
     };

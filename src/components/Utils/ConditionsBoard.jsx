@@ -18,7 +18,7 @@ const ConditionsBoard = ({ message, onCancel, onConfirm }) => (
           </thead>
           <tbody>
             {message.map((line, index) => {
-              const [type, min, max, current, status] = line.split(' ');
+              const [type, min, max, current, status] = line.split(',');
               return (
                 <tr key={index}>
                   <td className="p-3">{type}</td>
