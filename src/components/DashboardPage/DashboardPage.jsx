@@ -49,7 +49,7 @@ const TeamPlayers = ({ type, data }) => {
   return (
     <div className='flex flex-col'>
       <p className='powercard-text text-xl'>{type.toUpperCase()}</p>
-      <div className='flex flex-wrap items-center'>
+      <div className='flex flex-wrap items-center justify-evenly'>
         {playersData.map(player => (
           player.type === type &&
           <div className="px-8 py-4" key={player.playerName}>
