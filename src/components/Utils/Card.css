@@ -5,8 +5,16 @@
   width: 10vw;
   height: 16vw;
   cursor: pointer;
-  border: .2rem solid white;
+  border: .2rem solid whitesmoke;
   border-radius: 10px;
+}
+
+.legend {
+  border: .2rem solid gold;
+}
+
+.elite{
+  border: .2rem solid rgb(230, 43, 230);
 }
 
 .card-front,
@@ -27,7 +35,7 @@
   color: white;
   text-align: center;
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  background: rgba(26, 166, 162, 0.85);
+  background: rgba(13, 156, 151, 0.85);
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
 }
