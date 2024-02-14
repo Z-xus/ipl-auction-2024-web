@@ -5,7 +5,7 @@
   width: 10vw;
   height: 16vw;
   cursor: pointer;
-  border: .2rem solid rgba(88, 130, 193, 0.49);
+  border: .2rem solid white;
   border-radius: 10px;
 }
 
@@ -16,17 +16,18 @@
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 0.75rem;
+  /* background-image : linear-gradient(to right,rgb(29, 14, 52),rgb(13, 14, 75)); */
 }
 
 .player-name {
   font-size: 1.1rem;
   font-family: 'Economica', Verdana, Geneva, Tahoma, sans-serif;
   font-weight: 900;
-  line-height: 1.4rem;
+  line-height: 1.2rem;
   color: white;
   text-align: center;
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  background: rgb(0,21,46,1);
+  background: rgba(26, 166, 162, 0.85);
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
 }
@@ -53,11 +54,11 @@
 
 .back-stat-container {
   margin: .20rem .20rem 0 .20rem;
-  padding: .4rem;
+  padding: .3rem;
 }
 
 .stat-text {
-  font-size: .9rem;
+  font-size: .8rem;
   font-family: "Dosis", Verdana, Geneva, Tahoma, sans-serif;
   font-weight: 700;
   color: #1B223E;

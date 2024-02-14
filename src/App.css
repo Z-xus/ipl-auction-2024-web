@@ -54,6 +54,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  backdrop-filter: blur(1.5px) brightness(0.5) contrast(0.95);
   min-width: 320px;
   min-height: 100vh;
 }

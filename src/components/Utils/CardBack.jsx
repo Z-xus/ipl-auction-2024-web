@@ -5,7 +5,7 @@ const CardBack = ({ playerData }) => {
 
   return (
     <div className='card card-back w-32 h-44 mx-1 p-1.5'>
-      <p className="text-ellipsis overflow-hidden player-name">{playerName}</p>
+      <p className="text-ellipsis player-name rounded-md my-1">{playerName}</p>
       <div className="rounded-md bg-white text-center shadow-md p-0.5 mx-1">
         <p className="stat-text">Overall: {overall}</p>
       </div>

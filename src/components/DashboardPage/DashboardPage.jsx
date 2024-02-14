@@ -49,7 +49,7 @@ const TeamPlayers = ({ type, data }) => {
   return (
     <div className='flex flex-col'>
       <p className='powercard-text text-xl'>{type.toUpperCase()}</p>
-      <div className='flex flex-wrap items-center'>
+      <div className='flex flex-wrap items-center justify-evenly'>
         {playersData.map(player => (
           player.type === type &&
           <div className="px-8 py-4" key={player.playerName}>
@@ -227,7 +227,7 @@ const DashboardPage = ({ teamDetails }) => {
 
       {/* Team Players */}
       <div className="overflow-y-auto m-1/12 p-2 custom-scrollbar">
-        <p className='powercard-text text-2xl my-2'> CURRENT TEAM PLAYERS </p>
+        <p className='powercard-text text-2xl my-4'> CURRENT TEAM PLAYERS </p>
         {playerTypes.map(type => (<TeamPlayers key={type} type={type} data={players} />))}
       </div>
     </div>
