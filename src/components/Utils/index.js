@@ -4,5 +4,6 @@ import Popup from './Popup';
 import Powercard from './Powercard';
 import ConditionsBoard from './ConditionsBoard';
 import CaptaincyPopup from './CaptaincyPopup';
+import { numberConvert, fetchPlayerData } from './UtilFunc';
 
-export { Navbar, Card, Popup, Powercard, ConditionsBoard, CaptaincyPopup };
+export { Navbar, Card, Popup, Powercard, ConditionsBoard, CaptaincyPopup, numberConvert, fetchPlayerData };

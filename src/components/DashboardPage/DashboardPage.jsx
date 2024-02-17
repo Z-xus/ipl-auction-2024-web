@@ -1,47 +1,26 @@
 // import React from 'react';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import PropTypes from 'prop-types';
 import io from 'socket.io-client';
-import { Navbar, Card, Powercard } from "../Utils";
+import { Navbar, Card, Powercard, numberConvert, fetchPlayerData } from "../Utils";
 import "./DashboardPage.css";
 
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 const socket = io(SERVERURL);
 
-function numberConvert(number) {
-  let num = Math.abs(Number(number));
-  let sign = Math.sign(num);
-
-  if (num >= 1e7)
-    return `${sign * (num / 1e7).toFixed(1)} CR`;
-  else if (num >= 1e5)
-    return `${sign * (num / 1e5).toFixed(1)} L`;
-  else if (num >= 1e3)
-    return `${sign * (num / 1e3).toFixed(1)} K`;
-  else
-    return (sign * num).toString();
-}
-
 const TeamPlayers = ({ type, data }) => {
   const [playersData, setPlayersData] = useState([]);
 
   useEffect(() => {
-    const fetchPlayerData = async () => {
+    const fetchData = async () => {
       try {
-        const playerPromises = data.map(async (playerID) => {
-          const response = await axios.post(`${SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
-          return response.data;
-        });
-
-        const resolvedPlayers = await Promise.all(playerPromises);
+        const resolvedPlayers = await Promise.all(data.map(playerID => fetchPlayerData(SERVERURL, playerID)));
         setPlayersData(resolvedPlayers);
       } catch (error) {
         console.error('Error fetching player data:', error);
       }
     };
 
-    fetchPlayerData();
+    fetchData();
   }, [data]);
 
   if (!playersData.find(player => player.type === type)) return null;
@@ -62,11 +41,6 @@ const TeamPlayers = ({ type, data }) => {
   );
 };
 
-TeamPlayers.propTypes = {
-  type: PropTypes.string.isRequired,
-  data: PropTypes.array.isRequired
-};
-
 const DashboardPage = ({ teamDetails }) => {
   const playerTypes = ['Batsman', 'Bowler', 'All Rounder', 'Wicket Keeper'];
   const [username, setUsername] = useState(localStorage.getItem("username"));
@@ -78,7 +52,6 @@ const DashboardPage = ({ teamDetails }) => {
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
-    // useEffect is too much pain
     socket.on('connect', () => {
       console.log("connected");
       setIsConnected(true);
@@ -88,116 +61,58 @@ const DashboardPage = ({ teamDetails }) => {
       setIsConnected(false);
     });
 
-    if (teamDetails) {
-      setTeam(teamDetails.teamName);
-      setBudget(teamDetails.budget);
-      setPlayers(teamDetails.players);
-      setPowercards(teamDetails.powercards);
-    }
-    else {
-      socket.on(`playerAdded${team}${slot}`, (data) => {
-        const newPlayerId = data.payload.playerID;
-        const newBudget = data.payload.budget;
-        const tempPlayers = JSON.parse(localStorage.getItem("players"));
+    const handlePlayer = (data, action) => {
+      const newPlayerId = data.payload.playerID;
+      const newBudget = data.payload.budget;
 
-        setPlayers(prevPlayers => {
-          if (JSON.stringify(prevPlayers) != JSON.stringify(tempPlayers)) {
-            // We are on Spectate Page, Don't update display
-            const playerIndex = tempPlayers.indexOf(newPlayerId);
-            if (playerIndex === -1) {
-              const updatedPlayers = [...tempPlayers, newPlayerId];
-              localStorage.setItem("players", JSON.stringify(updatedPlayers));
-              localStorage.setItem("budget", JSON.stringify(newBudget));
-            }
-            return prevPlayers;
-          }
+      setPlayers(prevPlayers => {
+        const playerIndex = prevPlayers.indexOf(newPlayerId);
 
-          // Return updated players list
-          const playerIndex = prevPlayers.indexOf(newPlayerId);
-          if (playerIndex === -1) {
-            const updatedPlayers = [...prevPlayers, newPlayerId];
-            localStorage.setItem("players", JSON.stringify(updatedPlayers));
-            setBudget(newBudget);
-            localStorage.setItem("budget", JSON.stringify(newBudget));
-            return updatedPlayers;
-          }
+        if (playerIndex === -1 && action === "add") {
+          const updatedPlayers = [...prevPlayers, newPlayerId];
+          localStorage.setItem("players", JSON.stringify(updatedPlayers));
+          localStorage.setItem("budget", JSON.stringify(newBudget));
+          setBudget(newBudget);
+          return updatedPlayers;
+        }
+        else if (playerIndex !== -1 && action === "delete") {
+          const updatedPlayers = [...prevPlayers.slice(0, playerIndex), ...prevPlayers.slice(playerIndex + 1)];
+          localStorage.setItem("players", JSON.stringify(updatedPlayers));
+          localStorage.setItem("budget", JSON.stringify(newBudget));
+          setBudget(newBudget);
+          return updatedPlayers;
+        }
 
-          return prevPlayers
-        });
-      })
+        return prevPlayers;
+      });
+    };
 
-      socket.on(`playerDeleted${team}${slot}`, (data) => {
-        const newPlayerId = data.payload.playerID;
-        const newBudget = data.payload.budget;
-        const tempPlayers = JSON.parse(localStorage.getItem("players"));
+    socket.on(`playerAdded${team}${slot}`, data => handlePlayer(data, "add"));
+    socket.on(`playerDeleted${team}${slot}`, data => handlePlayer(data, "delete"));
 
-        setPlayers(prevPlayers => {
-          if (JSON.stringify(prevPlayers) != JSON.stringify(tempPlayers)) {
-            // We are on Spectate Page, Don't update display
-            const playerIndex = tempPlayers.indexOf(newPlayerId);
-            if (playerIndex !== -1) {
-              const updatedPlayers = [...tempPlayers.slice(0, playerIndex), ...tempPlayers.slice(playerIndex + 1)];
-              localStorage.setItem("players", JSON.stringify(updatedPlayers));
-              localStorage.setItem("budget", JSON.stringify(newBudget));
-            }
-            return prevPlayers;
-          }
+    const handlePowercard = (data) => {
+      const updatedPowercards = data.payload;
+      localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
+      setPowercards(updatedPowercards);
+    };
 
-          // Return updated players list
-          const playerIndex = prevPlayers.indexOf(newPlayerId);
-          if (playerIndex !== -1) {
-            const updatedPlayers = [...prevPlayers.slice(0, playerIndex), ...prevPlayers.slice(playerIndex + 1)];
-            localStorage.setItem("players", JSON.stringify(updatedPlayers));
-            setBudget(newBudget);
-            localStorage.setItem("budget", JSON.stringify(newBudget));
-            return updatedPlayers;
-          }
+    socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
+    socket.on(`usePowerCard${team}${slot}`, data => handlePowercard(data));
 
-          return prevPlayers;
-        });
-      })
-
-      const handlePowercard = (data) => {
-        const updatedPowercards = data.payload;
-
-        setPowercards(prevPowercards => {
-          const tempPowercards = JSON.parse(localStorage.getItem("powercards"));
-
-          if (JSON.stringify(prevPowercards) != JSON.stringify(tempPowercards)) {
-            // We are on Spectate Page, Don't update display
-            localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
-            return prevPowercards;
-          }
-
-          // Return updated powercards list
-          localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
-          return updatedPowercards;
-        });
-      }
-
-      socket.on(`powercardAdded${team}${slot}`, (data) => {
-        handlePowercard(data);
-      })
-
-      socket.on(`usePowerCard${team}${slot}`, (data) => {
-        handlePowercard(data)
-      })
-
-      socket.on(`teamAllocate${username}${slot}`, (data) => {
-        const teamData = data.payload
-        setTeam(teamData.teamName);
-        localStorage.setItem("team", teamData.teamName)
-        setBudget(teamData.budget);
-        localStorage.setItem("budget", teamData.budget)
-      })
-    }
+    socket.on(`teamAllocate${username}${slot}`, (data) => {
+      const teamData = data.payload;
+      setTeam(teamData.teamName);
+      localStorage.setItem("team", teamData.teamName);
+      setBudget(teamData.budget);
+      localStorage.setItem("budget", teamData.budget);
+    });
 
     return () => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, [username, team, slot, teamDetails]);
+  }, []);
 
   return (
     <div className="dashboard-container">
@@ -232,10 +147,6 @@ const DashboardPage = ({ teamDetails }) => {
       </div>
     </div>
   );
-};
-
-DashboardPage.propTypes = {
-  teamDetails: PropTypes.object
 };
 
 export default DashboardPage;
