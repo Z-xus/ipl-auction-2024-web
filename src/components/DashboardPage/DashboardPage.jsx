@@ -112,7 +112,7 @@ const DashboardPage = ({ teamDetails }) => {
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, []);
+  }, [username, team, slot]);
 
   return (
     <div className="dashboard-container">

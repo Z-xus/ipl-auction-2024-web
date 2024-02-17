@@ -1,5 +1,4 @@
-// import React from "react";
-import PropTypes from 'prop-types';
+// import React from 'react';
 import Tooltip from '@mui/material/Tooltip';
 
 const powercards = [
@@ -41,10 +40,5 @@ const Powercard = ({ name, isUsed }) => {
     </Tooltip>
   );
 }
-
-Powercard.propTypes = {
-  name: PropTypes.string.isRequired,
-  isUsed: PropTypes.bool.isRequired
-};
 
 export default Powercard;

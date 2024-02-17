@@ -1,7 +1,6 @@
-// import React from "react";
-import { useState } from "react";
+// import React from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import Drawer from '@mui/material/Drawer';
 import Popup from "./Popup";
 import "./Navbar.css";
@@ -19,12 +18,6 @@ const NavButton = ({ url, text, onClick }) => (
   </div>
 );
 
-NavButton.propTypes = {
-  url: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired
-};
-
 const SidebarItem = ({ url, logo, abbrv }) => (
   <tr className="text-center align-middle text-3xl font-bold">
     <td>
@@ -40,25 +33,19 @@ const SidebarItem = ({ url, logo, abbrv }) => (
   </tr>
 );
 
-SidebarItem.propTypes = {
-  url: PropTypes.string.isRequired,
-  logo: PropTypes.string.isRequired,
-  abbrv: PropTypes.string.isRequired,
-};
-
 const Navbar = ({ style = {} }) => {
   const team = localStorage.getItem("team");
   const navigate = useNavigate();
 
   // Popup Logic
   const [showPopup, setShowPopup] = useState(false);
-  const handleShowPopup = () => { setShowPopup(true) };
-  const handleClosePopup = () => { setShowPopup(false) };
+  const handleShowPopup = () => { setShowPopup(true); };
+  const handleClosePopup = () => { setShowPopup(false); };
 
   // Drawer Logic
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const handleShowDrawer = () => { setDrawerOpen(true) };
-  const handleCloseDrawer = () => { setDrawerOpen(false) };
+  const handleShowDrawer = () => { setDrawerOpen(true); };
+  const handleCloseDrawer = () => { setDrawerOpen(false); };
 
   const handleLogout = () => {
     handleShowPopup();

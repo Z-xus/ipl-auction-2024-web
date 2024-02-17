@@ -22,6 +22,6 @@ async function fetchPlayerData(serverUrl, playerID) {
     console.error('Error fetching player data for ID', playerID, ':', error);
     throw error;
   }
-};
+}
 
 export { numberConvert ,fetchPlayerData };

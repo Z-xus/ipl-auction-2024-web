@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import PropTypes from 'prop-types';
 import './LoginPage.css';
 
 const Input = ({ type, name, placeholder, label, onChange }) => (
@@ -11,14 +10,6 @@ const Input = ({ type, name, placeholder, label, onChange }) => (
     <input className="input-field" type={type} id={label} placeholder={placeholder} onChange={onChange} />
   </div>
 );
-
-Input.propTypes = {
-  type: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  placeholder: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  onChange: PropTypes.func
-};
 
 const LoginPage = () => {
   const [username, setUsername] = useState();
@@ -43,12 +34,12 @@ const LoginPage = () => {
       localStorage.setItem("budget", data.user.budget);
       localStorage.setItem("players", JSON.stringify(data.user.players));
       localStorage.setItem("powercards", JSON.stringify(data.user.powercards));
-      localStorage.setItem('leaderboard',JSON.stringify([]));
+      localStorage.setItem('leaderboard', JSON.stringify([]));
       navigate("/dashboard");
     } else {
       alert(data.message);
     }
-  }
+  };
 
   return (
     <div className="main">

@@ -68,7 +68,7 @@ const SpectatePage = () => {
     };
 
     fetchData();
-  }, [teamName]);
+  }, [teamName, slot]);
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -120,7 +120,7 @@ const SpectatePage = () => {
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, []);
+  }, [username, team, slot]);
 
   return (
     <div className="dashboard-container">
