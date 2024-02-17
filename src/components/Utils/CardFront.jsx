@@ -1,24 +1,25 @@
 // import React from 'react'
-import { useState } from "react";
+import { useState } from 'react';
+import { numberConvert } from "../Utils"
 
-function numberConvert(number) {
-  let num = Math.abs(Number(number));
-  let sign = Math.sign(num);
+// function numberConvert(number) {
+//   let num = Math.abs(Number(number));
+//   let sign = Math.sign(num);
 
-  if (num >= 1e7)
-    return `${sign * (num / 1e7).toFixed(1)} CR`;
-  else if (num >= 1e5)
-    return `${sign * (num / 1e5).toFixed(1)} L`;
-  else if (num >= 1e3)
-    return `${sign * (num / 1e3).toFixed(1)} K`;
-  else
-    return (sign * num).toString();
-}
+//   if (num >= 1e7)
+//     return `${sign * (num / 1e7).toFixed(1)} CR`;
+//   else if (num >= 1e5)
+//     return `${sign * (num / 1e5).toFixed(1)} L`;
+//   else if (num >= 1e3)
+//     return `${sign * (num / 1e3).toFixed(1)} K`;
+//   else
+//     return (sign * num).toString();
+// }
 
 const CardFront = ({ playerData, isSelected, onSelect }) => {
   const [slot, setSlot] = useState(Number(localStorage.getItem("slot")));
   const playerName = playerData.playerName;
-  const cardType = playerData.gender == "legendary" ? 'legend' : playerData.Elite == "E" ? 'elite' : '';
+  const cardType = playerData.gender == "legendary" ? 'legend' : playerData.Elite == "E" ? 'elite' : playerData.gender == "female" ? "women" : '';
   const flag = playerData.flag;
   const priceIndex = playerData.isSold.findIndex(item => item.slot === slot);
   const price = playerData.isSold[priceIndex].budget;

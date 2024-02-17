@@ -46,7 +46,7 @@ const LeaderboardPage = () => {
         const teamName = data.payload.teamName;
 
         // Check if the team already exists in prevTeamsData
-        const teamExists = prevTeamsData.some(team => team.name === teamName);
+        const teamExists = prevTeamsData.find(team => team.name === teamName);
 
         // If the team doesn't exist, add it to the array
         if (!teamExists) {
@@ -54,9 +54,12 @@ const LeaderboardPage = () => {
           console.log(obj);
           return [...prevTeamsData, obj];
         }
-
-        // If the team already exists, return the current state without modification
-        return prevTeamsData;
+        else
+        {
+          const newArray = prevTeamsData.filter(team => team.name !== teamName)
+          teamExists.points = data.payload.score;
+          return [...newArray,teamExists]
+        }
       });
 
     });

@@ -14,7 +14,11 @@
 }
 
 .elite{
-  border: .2rem solid rgb(230, 43, 230);
+  border: .2rem solid rgb(195, 24, 69);
+}
+
+.women{
+  border: .2rem solid hotpink;
 }
 
 .card-front,

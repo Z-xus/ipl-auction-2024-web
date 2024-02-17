@@ -2,9 +2,10 @@
 
 const CardBack = ({ playerData }) => {
   const { playerName, overall, bat_ppl, bat_mo, bat_dth, bow_ppl, bow_mo, bow_dth } = playerData;
+  const cardType = playerData.gender == "legendary" ? 'legend' : playerData.Elite == "E" ? 'elite' : playerData.gender == "female" ? "women" : '';
 
   return (
-    <div className={`card card-back w-32 h-44 mx-1 p-1.5 ${playerData.gender == "legendary" ? 'legend' : playerData.Elite == "E" ? 'elite' : ''}`}>
+    <div className={`card card-back w-32 h-44 mx-1 p-1.5 ${cardType}`}>
       <p className="text-ellipsis player-name rounded-md my-1">{playerName}</p>
       <div className="rounded-md bg-white text-center shadow-md p-0.5 mx-1">
         <p className="stat-text">Overall: {overall}</p>
