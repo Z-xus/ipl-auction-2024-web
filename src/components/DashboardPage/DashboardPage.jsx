@@ -1,5 +1,6 @@
 // import React from 'react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import { Navbar, Card, Powercard, numberConvert, fetchPlayerData } from "../Utils";
 import "./DashboardPage.css";
@@ -34,14 +35,20 @@ const TeamPlayers = ({ players }) => {
 };
 
 const DashboardPage = () => {
-  const [username, setUsername] = useState(localStorage.getItem("username"));
-  const [team, setTeam] = useState(localStorage.getItem("team"));
-  const [slot, setSlot] = useState(localStorage.getItem("slot"));
-  const [budget, setBudget] = useState(localStorage.getItem("budget"));
-  const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")));
-  const [powercards, setPowercards] = useState(JSON.parse(localStorage.getItem("powercards")));
+  const [username, setUsername] = useState(localStorage.getItem("username") || "");
+  const [team, setTeam] = useState(localStorage.getItem("team") || "");
+  const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
+  const [budget, setBudget] = useState(localStorage.getItem("budget") || "NaN");
+  const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")) || []);
+  const [powercards, setPowercards] = useState(JSON.parse(localStorage.getItem("powercards")) || []);
   const [playersData, setPlayersData] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!username)
+      navigate("/");
+  }, [username, navigate]);
 
   useEffect(() => {
     socket.on('connect', () => {

@@ -1,8 +1,9 @@
 // import React from 'react';
 import { useState, useEffect } from 'react';
-import { Navbar } from '../Utils'
+import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
-import './LeaderboardPage.css'
+import { Navbar } from "../Utils";
+import "./LeaderboardPage.css";
 
 // const teamsData = [
 //   { name: 'Mumbai Indians', points: 20, position: 1 },
@@ -26,9 +27,16 @@ const LeaderboardItem = ({ position, name, points }) => (
 );
 
 const LeaderboardPage = () => {
+  const [username, setUsername] = useState(localStorage.getItem("username") || "");
+  const [teamsData, setTeamsData] = useState(JSON.parse(localStorage.getItem("leaderboard")) || []);
+  const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [teamsData, setTeamsData] = useState(JSON.parse(localStorage.getItem('leaderboard')));
-  const slot = localStorage.getItem("slot");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!username)
+      navigate("/");
+  }, [username, navigate]);
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -54,11 +62,10 @@ const LeaderboardPage = () => {
           console.log(obj);
           return [...prevTeamsData, obj];
         }
-        else
-        {
-          const newArray = prevTeamsData.filter(team => team.name !== teamName)
+        else {
+          const newArray = prevTeamsData.filter(team => team.name !== teamName);
           teamExists.points = data.payload.score;
-          return [...newArray,teamExists]
+          return [...newArray, teamExists];
         }
       });
 
@@ -73,8 +80,8 @@ const LeaderboardPage = () => {
   }, [slot]);
 
   useEffect(() => {
-    localStorage.setItem('leaderboard',JSON.stringify(teamsData))
-  },[teamsData])
+    localStorage.setItem('leaderboard', JSON.stringify(teamsData));
+  }, [teamsData]);
 
 
   return (

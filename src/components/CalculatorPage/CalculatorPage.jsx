@@ -1,5 +1,6 @@
 // import React from 'react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
@@ -31,7 +32,14 @@ const CalculatorPage = () => {
     const [showScoreboard, setShowScoreboard] = useState(false);
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
     // const [conditionsTitle, setConditionsboardTitle] = useState('');
-    const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")));
+    const [username, setUsername] = useState(localStorage.getItem("username") || "");
+    const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")) || []);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!username)
+            navigate("/");
+    }, [username, navigate]);
 
     useEffect(() => {
         const fetchPlayerData = async () => {

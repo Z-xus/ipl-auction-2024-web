@@ -11,7 +11,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path='/' element={<LoginPage />} />
         <Route path='/dashboard' element={<DashboardPage />} />
         <Route path='/calculator' element={<CalculatorPage />} />
-        <Route path='/calculator' element={<CalculatorPage />} />
         <Route path='/leaderboard' element={<LeaderboardPage />} />
         <Route path='/spectate/:teamName' element={<SpectatePage />} />
       </Routes>

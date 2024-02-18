@@ -1,6 +1,6 @@
 // import React from 'react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
 import { Navbar, Powercard, numberConvert, fetchPlayerData } from "../Utils";
@@ -12,23 +12,31 @@ const socket = io(SERVERURL);
 
 const SpectatePage = () => {
   const { teamName } = useParams();
-  const [username, setUsername] = useState(localStorage.getItem("username"));
-  const [team, setTeam] = useState(localStorage.getItem("team"));
-  const [slot, setSlot] = useState(localStorage.getItem("slot"));
+  const [username, setUsername] = useState(localStorage.getItem("username") || "");
+  const [team, setTeam] = useState(localStorage.getItem("team") || "");
+  const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
   const [budget, setBudget] = useState("NaN");
   const [players, setPlayers] = useState([]);
   const [playersData, setPlayersData] = useState([]);
   const [powercards, setPowercards] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!username)
+      navigate("/");
+  }, [username, navigate]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.post(`${SERVERURL}/spectate/${teamName.toUpperCase()}`, { slot: slot }, { headers: { "Content-Type": "application/json" } });
         const spectateTeam = response.data.spectateTeam;
-        setBudget(spectateTeam.budget);
-        setPlayers(spectateTeam.players);
-        setPowercards(spectateTeam.powercards);
+        if (spectateTeam) {
+          setBudget(spectateTeam.budget);
+          setPlayers(spectateTeam.players);
+          setPowercards(spectateTeam.powercards);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
