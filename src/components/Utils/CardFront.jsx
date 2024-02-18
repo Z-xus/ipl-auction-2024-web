@@ -43,7 +43,7 @@ const CardFront = ({ playerData, isSelected, onSelect }) => {
             <p className="text-lg leading-tight stat-text"> {numberConvert(price)} </p>
           </div>
 
-          <img src={`/images/flag/${flag}.png`} alt="Country Flag" className="rounded-full h-9 w-9" />
+          <img src={`/images/flag/${flag}.png`} alt="Country Flag" className="h-6 w-9" />
         </div>
       </div>
 
