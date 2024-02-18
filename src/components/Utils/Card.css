@@ -11,12 +11,12 @@
 
 .legend {
   border: .2rem solid gold;
-  box-shadow: 0 0 45px gold;
+  box-shadow: 0 0 50px gold;
 }
 
 .elite{
   border: .2rem solid rgb(195, 24, 69);
-  box-shadow: 0 0 45px rgb(195, 24, 69);
+  box-shadow: 0 0 50px rgb(195, 24, 69);
 }
 
 .women{
