@@ -6,49 +6,41 @@ import "./DashboardPage.css";
 
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 const socket = io(SERVERURL);
+const PLAYERTYPES = ['Batsman', 'Bowler', 'All Rounder', 'Wicket Keeper'];
 
-const TeamPlayers = ({ type, data }) => {
-  const [playersData, setPlayersData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const resolvedPlayers = await Promise.all(data.map(playerID => fetchPlayerData(SERVERURL, playerID)));
-        setPlayersData(resolvedPlayers);
-      } catch (error) {
-        console.error('Error fetching player data:', error);
-      }
-    };
-
-    fetchData();
-  }, [data]);
-
-  if (!playersData.find(player => player.type === type)) return null;
-
+const TeamPlayers = ({ players }) => {
   return (
-    <div className='flex flex-col'>
-      <p className='powercard-text text-xl'>{type.toUpperCase()}</p>
-      <div className='flex flex-wrap items-center justify-evenly'>
-        {playersData.map(player => (
-          player.type === type &&
-          <div className="px-8 py-4" key={player.playerName}>
-            <Card data={player} />
+    <>
+      {PLAYERTYPES.map(type => {
+        const filteredPlayers = players.filter(player => player.type === type);
+
+        if (filteredPlayers.length === 0) return null;
+
+        return (
+          <div className='flex flex-col' key={type}>
+            <p className='powercard-text text-xl'>{type.toUpperCase()}</p>
+            <div className='flex flex-wrap items-center justify-evenly'>
+              {filteredPlayers.map(player => (
+                <div className="px-8 py-4" key={player.playerName}>
+                  <Card data={player} />
+                </div>
+              ))}
+            </div>
           </div>
-        )
-        )}
-      </div>
-    </div>
+        );
+      })}
+    </>
   );
 };
 
-const DashboardPage = ({ teamDetails }) => {
-  const playerTypes = ['Batsman', 'Bowler', 'All Rounder', 'Wicket Keeper'];
+const DashboardPage = () => {
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [team, setTeam] = useState(localStorage.getItem("team"));
   const [slot, setSlot] = useState(localStorage.getItem("slot"));
   const [budget, setBudget] = useState(localStorage.getItem("budget"));
   const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")));
   const [powercards, setPowercards] = useState(JSON.parse(localStorage.getItem("powercards")));
+  const [playersData, setPlayersData] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
@@ -114,6 +106,19 @@ const DashboardPage = ({ teamDetails }) => {
     };
   }, [username, team, slot]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resolvedPlayers = await Promise.all(players.map(playerID => fetchPlayerData(SERVERURL, playerID)));
+        setPlayersData(resolvedPlayers);
+      } catch (error) {
+        console.error('Error fetching player data:', error);
+      }
+    };
+
+    fetchData();
+  }, [players]);
+
   return (
     <div className="dashboard-container">
       {/* Navbar */}
@@ -143,10 +148,11 @@ const DashboardPage = ({ teamDetails }) => {
       {/* Team Players */}
       <div className="overflow-y-auto m-1/12 p-2 custom-scrollbar">
         <p className='powercard-text text-2xl my-4'> CURRENT TEAM PLAYERS </p>
-        {playerTypes.map(type => (<TeamPlayers key={type} type={type} data={players} />))}
+        <TeamPlayers players={playersData} />
       </div>
     </div>
   );
 };
 
 export default DashboardPage;
+export { TeamPlayers };

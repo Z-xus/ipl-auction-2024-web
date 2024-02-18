@@ -3,62 +3,29 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
-import { Navbar, Card, Powercard, numberConvert, fetchPlayerData } from "../Utils";
+import { Navbar, Powercard, numberConvert, fetchPlayerData } from "../Utils";
+import { TeamPlayers } from "../DashboardPage/DashboardPage";
 import "../DashboardPage/DashboardPage.css";
 
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 const socket = io(SERVERURL);
 
-const TeamPlayers = ({ type, data }) => {
-  const [playersData, setPlayersData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const resolvedPlayers = await Promise.all(data.map(playerID => fetchPlayerData(SERVERURL, playerID)));
-        setPlayersData(resolvedPlayers);
-      } catch (error) {
-        console.error('Error fetching player data:', error);
-      }
-    };
-
-    fetchData();
-  }, [data]);
-
-  if (!playersData.find(player => player.type === type)) return null;
-
-  return (
-    <div className='flex flex-col'>
-      <p className='powercard-text text-xl'>{type.toUpperCase()}</p>
-      <div className='flex flex-wrap items-center justify-evenly'>
-        {playersData.map(player => (
-          player.type === type &&
-          <div className="px-8 py-4" key={player.playerName}>
-            <Card data={player} />
-          </div>
-        )
-        )}
-      </div>
-    </div>
-  );
-};
-
 const SpectatePage = () => {
   const { teamName } = useParams();
-  const playerTypes = ['Batsman', 'Bowler', 'All Rounder', 'Wicket Keeper'];
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [team, setTeam] = useState(localStorage.getItem("team"));
   const [slot, setSlot] = useState(localStorage.getItem("slot"));
-  const [budget, setBudget] = useState("Nan");
+  const [budget, setBudget] = useState("NaN");
   const [players, setPlayers] = useState([]);
+  const [playersData, setPlayersData] = useState([]);
   const [powercards, setPowercards] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${SERVERURL}/spectate/${teamName.toUpperCase()}/${slot}`);
-        const spectateTeam = response.data.newUser;
+        const response = await axios.post(`${SERVERURL}/spectate/${teamName.toUpperCase()}`, { slot: slot }, { headers: { "Content-Type": "application/json" } });
+        const spectateTeam = response.data.spectateTeam;
         setBudget(spectateTeam.budget);
         setPlayers(spectateTeam.players);
         setPowercards(spectateTeam.powercards);
@@ -122,6 +89,19 @@ const SpectatePage = () => {
     };
   }, [username, team, slot]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resolvedPlayers = await Promise.all(players.map(playerID => fetchPlayerData(SERVERURL, playerID)));
+        setPlayersData(resolvedPlayers);
+      } catch (error) {
+        console.error('Error fetching player data:', error);
+      }
+    };
+
+    fetchData();
+  }, [players]);
+
   return (
     <div className="dashboard-container">
       {/* Navbar */}
@@ -151,7 +131,7 @@ const SpectatePage = () => {
       {/* Team Players */}
       <div className="overflow-y-auto m-1/12 p-2 custom-scrollbar">
         <p className='powercard-text text-2xl my-4'> CURRENT TEAM PLAYERS </p>
-        {playerTypes.map(type => (<TeamPlayers key={type} type={type} data={players} />))}
+        <TeamPlayers players={playersData} />
       </div>
     </div>
   );
