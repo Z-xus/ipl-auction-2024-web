@@ -84,6 +84,39 @@ const SpectatePage = () => {
     socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
     socket.on(`usePowerCard${team}${slot}`, data => handlePowercard(data));
 
+    const handleSpectateTeamPlayer = (data, action) => {
+      const newPlayerId = data.payload.playerID;
+      const newBudget = data.payload.budget;
+
+      setPlayers(prevPlayers => {
+        const playerIndex = prevPlayers.indexOf(newPlayerId);
+
+        if (playerIndex === -1 && action === "add") {
+          const updatedPlayers = [...prevPlayers, newPlayerId];
+          setBudget(newBudget);
+          return updatedPlayers;
+        }
+        else if (playerIndex !== -1 && action === "delete") {
+          const updatedPlayers = [...prevPlayers.slice(0, playerIndex), ...prevPlayers.slice(playerIndex + 1)];
+          setBudget(newBudget);
+          return updatedPlayers;
+        }
+
+        return prevPlayers;
+      });
+    };
+
+    socket.on(`playerAdded${teamName.toUpperCase()}${slot}`, data => handleSpectateTeamPlayer(data, "add"));
+    socket.on(`playerDeleted${teamName.toUpperCase()}${slot}`, data => handleSpectateTeamPlayer(data, "delete"));
+
+    const handleSpectateTeamPowercard = (data) => {
+      const updatedPowercards = data.payload;
+      setPowercards(updatedPowercards);
+    };
+
+    socket.on(`powercardAdded${teamName.toUpperCase()}${slot}`, data => handleSpectateTeamPowercard(data));
+    socket.on(`usePowerCard${teamName.toUpperCase()}${slot}`, data => handleSpectateTeamPowercard(data));
+
     socket.on(`teamAllocate${username}${slot}`, (data) => {
       const teamData = data.payload;
       localStorage.setItem("team", teamData.teamName);
@@ -95,7 +128,7 @@ const SpectatePage = () => {
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, [username, team, slot]);
+  }, [username, team, teamName, slot]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -121,7 +154,7 @@ const SpectatePage = () => {
       <div className="team-container flex-col px-4">
         {/* Budget Info */}
         <div className="flex flex-col items-center">
-          <img className="max-h-52 py-6" src={`/images/teamlogo/${teamName.toLowerCase()}.png`} alt="" />
+          <img className="max-h-52 py-6" src={`/images/teamlogo/${teamName}.png`} alt="" />
           <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
           <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(budget)}</p>
           <hr className="w-11/12" />
