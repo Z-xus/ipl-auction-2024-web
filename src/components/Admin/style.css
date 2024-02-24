@@ -32,12 +32,18 @@
     padding: 8px;
     margin-bottom: 10px;
     margin-left: 20px;
+    color: black !important ;
   }
 
   select {
     padding: 8px;
     margin-bottom: 10px;
     margin-left: 20px;
+    color: black !important ;
+  }
+
+  option {
+    color : black;
   }
   
   .submit-button {
