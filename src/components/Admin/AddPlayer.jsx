@@ -27,20 +27,17 @@ const AddPlayer = () => {
       });
 
       console.log('Server response:', response.data);
+      setPrice('')
+      setSlot('')
+      setTeamName('')
+      setplayerName('')
     } catch (error) {
       console.error('Error submitting form:', error);
     }
   };
 
   return (
-    <div className="add-player-container">
-
-      <Link to='/admin'>
-        <button className="home-button">
-          Home
-        </button>
-      </Link>
-      
+    <div className="add-player-container" style={{marginBottom : "2rem"}}> 
       <h2>Add Player Form</h2>
 
       <form onSubmit={handleSubmit} className="form">

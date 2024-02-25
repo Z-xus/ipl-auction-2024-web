@@ -28,6 +28,10 @@ const ManagePowercardForm = () => {
       })
 
       console.log(response.data);
+      setAction('')
+      setSelectedPowercard('')
+      setSlot('')
+      setTeamName('')
 
     }catch (error)
     {
@@ -36,13 +40,7 @@ const ManagePowercardForm = () => {
   };
 
   return (
-    <div className="add-player-container">
-
-      <Link to='/admin'>
-        <button className="home-button">
-          Home
-        </button>
-      </Link>
+    <div className="add-player-container" style={{marginBottom : "2rem"}}>
       
       <h2>Manage Powercard Form</h2>
       <form onSubmit={handleSubmit} className='form'>

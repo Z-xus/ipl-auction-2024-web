@@ -24,6 +24,9 @@ const DeletePlayer = () => {
       })
 
       console.log(`Submitted response : ${response.data}`);
+      setSlot('')
+      setTeamName('')
+      setplayerName('')
     }catch (error)
     {
       console.log(error);
@@ -31,13 +34,8 @@ const DeletePlayer = () => {
   };
 
   return (
-    <div className="add-player-container">
+    <div className="add-player-container" style={{marginBottom : "2rem"}}>
 
-      <Link to='/admin'>
-        <button className="home-button">
-          Home
-        </button>
-      </Link>
       
       <h2>Delete Player Form</h2>
 
