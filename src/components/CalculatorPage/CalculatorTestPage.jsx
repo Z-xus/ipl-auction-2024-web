@@ -1,26 +1,25 @@
 // import React from 'react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
 import './CalculatorPage.css';
 
-// TODO: Add player underdog logic. ✅
-// TODO2: Add legendary player logic. ✅
 // TODO3: Add captaincy points. ✅
 // TODO4: Sum bonus logic (90%/80%/70%). ❌
 // TODO5: Add penalty points. ❌
 // TODO6: submit the points to api. ❌
 // TODO7: Add conditions min ppl, mo, dth. ❌
 
+// TODO: Stop points updating from selectedProps.
+// TODO: Add all the points after clicking on submit button.
+// TODO: Calculate bonus points: overall of each player + player chemistry - violations * 100 + captaincy points.
+
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 
-const CalculatorPage = () => {
+const CalculatorTestPage = () => {
 
     const [points, setPoints] = useState(0);
-    const [bonusPoints, setBonusPoints] = useState(0);
-    const [penaltyPoints, setPenaltyPoints] = useState(0);
     const [playerData, setPlayerData] = useState([]);
     const [availablePlayers, setAvailablePlayers] = useState([]);
     const [playerCards, setPlayerCards] = useState([]);
@@ -31,26 +30,7 @@ const CalculatorPage = () => {
 
     const [showScoreboard, setShowScoreboard] = useState(false);
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
-
-    const [username, setUsername] = useState(localStorage.getItem("username") || "");
-    const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")) || []);
-
-    // State for tracking which bonus points have been added
-    const [bonusPointsAdded, setBonusPointsAdded] = useState({
-        bat_ppl: 0,
-        bat_mo: 0,
-        bat_dth: 0,
-        bow_ppl: 0,
-        bow_mo: 0,
-        bow_dth: 0
-    });
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!username)
-            navigate("/");
-    }, [username, navigate]);
+    const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")));
 
     useEffect(() => {
         const fetchPlayerData = async () => {
@@ -99,59 +79,6 @@ const CalculatorPage = () => {
         else if (selectedBox === 3) prop += "dth";
 
         return prop;
-    };
-
-    const statSum = (prop) => {
-        let sum = 0;
-        playerCards.forEach(player => {
-            if (player.selectedProps.includes(prop)) {
-                sum += player[prop];
-            }
-        });
-        return sum;
-    };
-
-    // Function to calculate bonus points
-    const pointCalculation = () => {
-        const maxStats = [
-            { prop: "bat_ppl", max: 40 },
-            { prop: "bat_mo", max: 40 },
-            { prop: "bat_dth", max: 30 },
-            { prop: "bow_ppl", max: 30 },
-            { prop: "bow_mo", max: 30 },
-            { prop: "bow_dth", max: 40 }
-        ];
-
-        maxStats.forEach(stat => {
-            const { prop, max } = stat;
-            const sumStat = statSum(prop);
-
-            let bonusToAdd = 0;
-            if (sumStat > 0.9 * max) {
-                bonusToAdd = 5;
-            } else if (sumStat > 0.8 * max) {
-                bonusToAdd = 3;
-            } else if (sumStat > 0.7 * max) {
-                bonusToAdd = 1;
-            }
-            console.log(`Bonus to add for ${prop}: ${bonusToAdd}`);
-            console.log(`Flags: ${JSON.stringify(bonusPointsAdded)}`)
-
-            // Adjust for previously added bonus points
-            const previousBonus = bonusPointsAdded[prop];
-            if (previousBonus > 0) {
-                setBonusPoints(prevPoints => prevPoints - previousBonus);
-            }
-
-            // Update the state to indicate that bonus points have been added for this statistic
-            setBonusPointsAdded(prevState => ({
-                ...prevState,
-                [prop]: bonusToAdd
-            }));
-
-            // Update the total bonus points
-            setBonusPoints(prevPoints => prevPoints + bonusToAdd);
-        });
     };
 
     const addBonusPoints = () => {
@@ -265,8 +192,6 @@ const CalculatorPage = () => {
             }
         });
 
-        pointCalculation();
-
         // Check if player is being added to playerCards[] for the first time
         if (!playerCards.some(player => player.playerName === data.playerName)) {
             // console.log("Player being added for the first time");
@@ -316,13 +241,10 @@ const CalculatorPage = () => {
         });
         if (playerExists) return; // _data.count++;
 
-        pointCalculation();
-
         calculateAndUpdatePoints(_data);
 
         // console.log("Count of " + _data.playerName + ": " + _data.count);
         setPlayerCards([...playerCards, _data]);
-
     };
 
     const handleClearCards = () => {
@@ -333,7 +255,6 @@ const CalculatorPage = () => {
         // remove all cards from playerCards[] and put all into availablePlayers[]
         setAvailablePlayers(playerData);
         setPlayerCards([]);
-
     };
 
     const handleSubmit = () => {
@@ -395,9 +316,6 @@ const CalculatorPage = () => {
 
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">
-                    Bonus Points: {bonusPoints}
-                </div>
-                <div className="total-points text-2xl inline py-4 px-6">
                     Total Points: {points}
                 </div>
                 {
@@ -447,6 +365,4 @@ const CalculatorPage = () => {
         </div>
     );
 };
-export default CalculatorPage;
-
-
+export default CalculatorTestPage;
