@@ -1,18 +1,9 @@
-// import React from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
 import './CalculatorPage.css';
-
-// TODO: Add player underdog logic. ✅
-// TODO2: Add legendary player logic. ✅
-// TODO3: Add captaincy points. ✅
-// TODO4: Sum bonus logic (90%/80%/70%). ❌
-// TODO5: Add penalty points. ❌
-// TODO6: submit the points to api. ❌
-// TODO7: Add conditions min ppl, mo, dth. ❌
 
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 

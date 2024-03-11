@@ -1,36 +1,50 @@
 // import React from 'react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
 import './CalculatorPage.css';
 
-// TODO3: Add captaincy points. ✅
-// TODO4: Sum bonus logic (90%/80%/70%). ❌
-// TODO5: Add penalty points. ❌
-// TODO6: submit the points to api. ❌
-// TODO7: Add conditions min ppl, mo, dth. ❌
-
-// TODO: Stop points updating from selectedProps.
-// TODO: Add all the points after clicking on submit button.
-// TODO: Calculate bonus points: overall of each player + player chemistry - violations * 100 + captaincy points.
-
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 
 const CalculatorTestPage = () => {
 
+    // Data
     const [points, setPoints] = useState(0);
+    const [bonusPoints, setBonusPoints] = useState(0);
+    const [penaltyPoints, setPenaltyPoints] = useState(0);
     const [playerData, setPlayerData] = useState([]);
     const [availablePlayers, setAvailablePlayers] = useState([]);
     const [playerCards, setPlayerCards] = useState([]);
+    const [captainName, setCaptainName] = useState(null);
+    const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
+    // UI
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
-    const [captainName, setCaptainName] = useState(null);
     const [errMessage, setErrMessage] = useState("");
-
     const [showScoreboard, setShowScoreboard] = useState(false);
-    const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
-    const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")));
+    // Refresh
+    const [username, setUsername] = useState(localStorage.getItem("username") || "");
+    const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")) || []);
+
+    // State for tracking which bonus points have been added
+    const [bonusPointsAdded, setBonusPointsAdded] = useState({
+        //  stat: bonus calulated
+        bat_ppl: 0,
+        bat_mo: 0,
+        bat_dth: 0,
+        bow_ppl: 0,
+        bow_mo: 0,
+        bow_dth: 0
+    });
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!username)
+            navigate("/");
+    }, [username, navigate]);
 
     useEffect(() => {
         const fetchPlayerData = async () => {
@@ -80,6 +94,101 @@ const CalculatorTestPage = () => {
 
         return prop;
     };
+
+    const statSum = (prop) => {
+        let sum = 0;
+        playerCards.forEach(player => {
+            if (player.selectedProps.includes(prop)) {
+                sum += player[prop];
+            }
+        });
+        return sum;
+    };
+
+    const calculateBonusFromStats = () => {
+        const maxStats = [
+            { prop: "bat_ppl", max: 40 },
+            { prop: "bat_mo", max: 40 },
+            { prop: "bat_dth", max: 30 },
+            { prop: "bow_ppl", max: 30 },
+            { prop: "bow_mo", max: 30 },
+            { prop: "bow_dth", max: 40 }
+        ];
+
+        maxStats.forEach(stat => {
+            const { prop, max } = stat;
+            const sumStat = statSum(prop);
+            console.log(`Sum of ${prop}: ${sumStat}`);
+
+            let bonusToAdd = 0;
+            let percentage = sumStat / max;
+            if (percentage > 0.9 && percentage <= 1) {
+                bonusToAdd = 5;
+            } else if (percentage > 0.8 && percentage <= 0.9) {
+                bonusToAdd = 3;
+            } else if (percentage > 0.7 && percentage <= 0.8) {
+                bonusToAdd = 1;
+            }
+
+            // Check if bonus points have already been added for this statistic
+            if (bonusToAdd > 0 && bonusPointsAdded[prop] < bonusToAdd) {
+                // Update the state to indicate that bonus points have been added for this statistic
+                setBonusPointsAdded(prevState => ({
+                    ...prevState,
+                    [prop]: bonusToAdd
+                }));
+
+                console.log("Bonus points added: ",bonusPointsAdded);
+                // Update the total bonus points
+                setBonusPoints(prevPoints => prevPoints + bonusToAdd);
+            }
+        });
+    };
+
+
+    // Function to calculate bonus points
+    // const pointCalculation = () => {
+    //     const maxStats = [
+    //         { prop: "bat_ppl", max: 40 },
+    //         { prop: "bat_mo", max: 40 },
+    //         { prop: "bat_dth", max: 30 },
+    //         { prop: "bow_ppl", max: 30 },
+    //         { prop: "bow_mo", max: 30 },
+    //         { prop: "bow_dth", max: 40 }
+    //     ];
+    //
+    //     maxStats.forEach(stat => {
+    //         const { prop, max } = stat;
+    //         const sumStat = statSum(prop);
+    //         console.log(`Sum of ${prop}: ${sumStat}`);
+    //
+    //         let bonusToAdd = 0;
+    //         if (sumStat > 0.9 * max) {
+    //             bonusToAdd = 5;
+    //         } else if (sumStat > 0.8 * max) {
+    //             bonusToAdd = 3;
+    //         } else if (sumStat > 0.7 * max) {
+    //             bonusToAdd = 1;
+    //         }
+    //         // console.log(`Bonus to add for ${prop}: ${bonusToAdd}`);
+    //         // console.log(`Flags: ${JSON.stringify(bonusPointsAdded)}`)
+    //
+    //         // Adjust for previously added bonus points
+    //         const previousBonus = bonusPointsAdded[prop];
+    //         if (previousBonus > 0) {
+    //             setBonusPoints(prevPoints => prevPoints - previousBonus);
+    //         }
+    //
+    //         // Update the state to indicate that bonus points have been added for this statistic
+    //         setBonusPointsAdded(prevState => ({
+    //             ...prevState,
+    //             [prop]: bonusToAdd
+    //         }));
+    //
+    //         // Update the total bonus points
+    //         setBonusPoints(prevPoints => prevPoints + bonusToAdd);
+    //     });
+    // };
 
     const addBonusPoints = () => {
         let bonusPoints = 0;
@@ -172,45 +281,6 @@ const CalculatorTestPage = () => {
     };
 
     const calculateAndUpdatePoints = (data) => {
-        // Decrease the count for the player whose points are updated
-        setAvailablePlayers(prevPlayers => prevPlayers.map(player => {
-            if (player.playerName === data.playerName) {
-                const updatedCount = player.count - 1;
-                if (updatedCount === 0) {
-                    return null;
-                } else {
-                    return { ...player, count: updatedCount };
-                }
-            }
-            return player;
-        }).filter(Boolean)); // Filter out null values to remove the dropped card
-
-        // Check if player is already selected in playerCards[]
-        playerCards.forEach(player => {
-            if (player.playerName === data.playerName) {
-                // console.log("Player already exists in playerCards[]");
-            }
-        });
-
-        // Check if player is being added to playerCards[] for the first time
-        if (!playerCards.some(player => player.playerName === data.playerName)) {
-            // console.log("Player being added for the first time");
-            handleSetPoints(data.overall)
-        }
-
-        const selectedProp = getStatProperty();
-        handleSetPoints(data[selectedProp]);
-
-        if (!data.selectedProps) { // Create the selectedProps array if it doesn't exist
-            data.selectedProps = [];
-        }
-
-        if (!data.selectedProps.includes(selectedProp)) { // Push the current selectedProp to the array if it's not already added
-            data.selectedProps.push(selectedProp);
-        }
-
-        // console.log("Data: " + JSON.stringify(data));
-        // console.log("selectedProps" + JSON.stringify(data.selectedProps));
     };
 
 
@@ -241,10 +311,52 @@ const CalculatorTestPage = () => {
         });
         if (playerExists) return; // _data.count++;
 
-        calculateAndUpdatePoints(_data);
+        // calculateBonusFromStats();
 
-        // console.log("Count of " + _data.playerName + ": " + _data.count);
+        // calculateAndUpdatePoints(_data); 
+
+        // Decrease the count for the player whose points are updated
+        setAvailablePlayers(prevPlayers => prevPlayers.map(player => {
+            if (player.playerName === _data.playerName) {
+                const updatedCount = player.count - 1;
+                if (updatedCount === 0) {
+                    return null;
+                } else {
+                    return { ...player, count: updatedCount };
+                }
+            }
+            return player;
+        }).filter(Boolean)); // Filter out null values to remove the dropped card
+
+        // Check if player is already selected in playerCards[]
+        playerCards.forEach(player => {
+            if (player.playerName === _data.playerName) {
+                // console.log("Player already exists in playerCards[]");
+            }
+        });
+
+        // Check if player is being added to playerCards[] for the first time
+        if (!playerCards.some(player => player.playerName === _data.playerName)) {
+            // console.log("Player being added for the first time");
+            handleSetPoints(_data.overall)
+        }
+
+        const selectedProp = getStatProperty();
+        handleSetPoints(_data[selectedProp]);
+
+        // Create the selectedProps array if it doesn't exist
+        if (!_data.selectedProps)
+            _data.selectedProps = [];
+
+        // Push the current selectedProp to the array if it's not already added
+        if (!_data.selectedProps.includes(selectedProp))
+            _data.selectedProps.push(selectedProp);
+
+        // console.log("Data: " + JSON.stringify(data));
+        // console.log("selectedProps" + JSON.stringify(data.selectedProps));
+
         setPlayerCards([...playerCards, _data]);
+
     };
 
     const handleClearCards = () => {
@@ -252,13 +364,16 @@ const CalculatorTestPage = () => {
         setSelectedBox(null);
         setSelectedRadioBox(null);
         setPoints(0);
+        setBonusPoints(0);
         // remove all cards from playerCards[] and put all into availablePlayers[]
         setAvailablePlayers(playerData);
         setPlayerCards([]);
+
     };
 
     const handleSubmit = () => {
-        addBonusPoints();
+        // addBonusPoints();
+        calculateBonusFromStats();
         const { message, allConditionsMet } = validatePlayerConditions();
         setShowScoreboard(true);
         setConditionsBoardMessage(message);
@@ -315,6 +430,9 @@ const CalculatorTestPage = () => {
             {showCapPopup && <CaptaincyPopup playerCards={playerCards} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
 
             <div className="main-title flex justify-between px-4 py-4 items-center">
+                <div className="total-points text-2xl inline py-4 px-6">
+                    Bonus Points: {bonusPoints}
+                </div>
                 <div className="total-points text-2xl inline py-4 px-6">
                     Total Points: {points}
                 </div>

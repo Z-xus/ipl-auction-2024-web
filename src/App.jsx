@@ -6,7 +6,7 @@ import AddPlayer from './components/Admin/AddPlayer'
 import DeletePlayer from './components/Admin/DeletePlayer'
 import ManagePowercard from './components/Admin/ManagePowercard';
 import AllocateTeam from './components/Admin/AllocateTeam'
-import { DashboardPage, LoginPage, LeaderboardPage, CalculatorPage, CalculatorTestPage, SpectatePage } from './components';
+import { DashboardPage, LoginPage, LeaderboardPage, CalculatorPage, CalculatorTestPage, CalculatorTestPage2, SpectatePage } from './components';
 import './App.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -18,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path='/dashboard' element={<DashboardPage />} />
         <Route path='/calculator' element={<CalculatorPage />} />
         <Route path='/testulator' element={<CalculatorTestPage />} />
+        <Route path='/tes2lator' element={<CalculatorTestPage2 />} />
         <Route path='/leaderboard' element={<LeaderboardPage />} />
         <Route path='/spectate/:teamName' element={<SpectatePage />} />
 
