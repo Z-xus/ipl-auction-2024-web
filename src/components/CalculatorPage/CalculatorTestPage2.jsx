@@ -1,6 +1,6 @@
 // TODO: Calculate points.
 // TODO: Use a storage to store the points and their descriptions for validation at backend.
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
@@ -28,7 +28,6 @@ const CalculatorTestPage = () => {
     const [availablePlayers, setAvailablePlayers] = useState([]);
     const [playerCards, setPlayerCards] = useState([]);
     const [captainName, setCaptainName] = useState(null);
-    const [prevCaptainName, setPrevCaptainName] = useState(null);
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,6 +225,7 @@ const CalculatorTestPage = () => {
     }
 
 
+    // FIXME: State doesnt update immediately, so we're using the previous state to update the points.
     const handleOnDrop = (e) => {
         let _data = e.dataTransfer.getData("Card");
 
@@ -295,23 +295,11 @@ const CalculatorTestPage = () => {
             return;
         }
 
-
-        // console.log("Available Players: ", availablePlayers);
-        console.log("Dropped Cards: ", droppedCards);
-        // console.log("Data: ", data);
-
-        // console.log("Bat PPL: ", (batPplCards));
-        // console.log("Bat Mo: ", (batMoCards));
-        // console.log("Bat Dth: ", (batDthCards));
-        // console.log("Bow Ppl: ", (bowPplCards));
-        // console.log("Bow Mo: ", (bowMoCards));
-        // console.log("Bow Dth: ", (bowDthCards));
-
-
         // POINT CALCULATION
         // points = overall points + condition points + captincy points + chemistry points + underdog points
         // We'll recalulate the points for the dropped cards and replace it with the current point to be accurate and avoid edge case handlings.
 
+        let total_points = 0;
         let overall_points = 0;
         let conditional_points = 0;
         let chemistry_points = 0;
@@ -319,11 +307,9 @@ const CalculatorTestPage = () => {
         let captaincy_points = 0;
 
         // OVERALL POINTS
-        // Check if player is being added to playerCards[] for the first time, else we dont add the overall points again.
-        if (!playerCards.some(player => player.playerName === _data.playerName)) {
-            console.log("Player being added for the first time");
-            overall_points = data.overall;
-        }
+        droppedCards.forEach(player => {
+            overall_points += player.overall;
+        });
 
         // CONDITION POINTS
         maxCardCapacity.forEach(row => {
@@ -339,6 +325,7 @@ const CalculatorTestPage = () => {
             }
         })
 
+        // TODO: Test if this works
         // UNDERDOG POINTS
         const underdogPlayers = droppedCards.filter(player => player.type === 'underdog');
         underdogPlayers.forEach(player => {
@@ -346,25 +333,24 @@ const CalculatorTestPage = () => {
         });
 
         // CHEMISTRY POINTS
-        // Iterate over droppedCards[] and check if two players have the same chemistry, if yes, add 5 points.
         droppedCards.forEach((player, index) => {
             for (let i = index + 1; i < droppedCards.length; i++) {
-                if (player.playerChemistry === droppedCards[i].playerChemistry) {
+                if (player.playerChemistry === droppedCards[i].playerChemistry)
                     chemistry_points += 5;
-                }
             }
         });
 
-        // Dunno.. but we'll see..
-        // If the current captain is the previous captain as well, then we dont add the captaincy points again.
-        // If the current captain is different from the previous captain, then we add the curent captaincy points and subtract the previous captaincy points.
-        // If the previous captain is null, then we add the current captaincy points.
-        // If the current captain is null, then we subtract the previous captaincy points.
+        // CAPTAINCY POINTS
+        droppedCards.forEach(player => { if (player.playerName === captainName) captaincy_points += player.captaincyRating; });
+
+        // TOTAL POINTS
+        total_points = overall_points + conditional_points + chemistry_points + underdog_points + captaincy_points;
+
+        setPoints(total_points);
 
         // Decreement the count of the player.
         setAvailablePlayers(prevPlayers => prevPlayers.map(player => {
             if (player.playerName === data.playerName) {
-                console.log(player.count);
                 const updatedCount = player.count - 1;
                 if (updatedCount === 0) {
                     return null;
@@ -390,12 +376,9 @@ const CalculatorTestPage = () => {
         setBowPplCards([]);
         setBowMoCards([]);
         setBowDthCards([]);
-
     };
 
     const handleSubmit = () => {
-        // addBonusPoints();
-        // calculateBonusFromStats();
         const { message, allConditionsMet } = validatePlayerConditions();
         setShowScoreboard(true);
         setConditionsBoardMessage(message);
@@ -432,11 +415,8 @@ const CalculatorTestPage = () => {
     };
 
     const handleConfirmCaptain = (player) => {
-        //  FIXME: Not Working.. no idea why..  says no available players..
-        if (!captainName === null) setPrevCaptainName(captainName);
+        console.log("Captain Player points: ", player.captaincyRating);
         setCaptainName(player.playerName);
-        console.log("Captain: " + JSON.stringify(captainName));
-        console.log("Prev Captain: " + JSON.stringify(prevCaptainName));
         // TODO: Add captain bonus points to the total points when sumbitting to the API.
         setShowCapPopup(false);
     };
@@ -452,15 +432,9 @@ const CalculatorTestPage = () => {
 
             {showScoreboard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
 
-            {showCapPopup && <CaptaincyPopup playerCards={playerCards} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
+            {showCapPopup && <CaptaincyPopup playerCards={droppedCards} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
 
             <div className="main-title flex justify-between px-4 py-4 items-center">
-                <div className="total-points text-2xl inline py-4 px-6">
-                    {
-                        // TODO: Temporary..
-                    }
-                    Bonus Points: {bonusPoints}
-                </div>
                 <div className="total-points text-2xl inline py-4 px-6">
                     {
                         // PERF: react-flip-numbers library?
@@ -504,7 +478,7 @@ const CalculatorTestPage = () => {
                 onDrop={handleOnDrop} onDragOver={handleDragOver}
             >
                 {
-                    // FIXME: not working when there is 0 elements in the array
+                    // FIXME: not working (sometimes) when there is 0 elements in the array
                     // no cards dropped yet or no buttons pressed yet.
                     (categoryArrayMapping.find(item => item.category === getStatProperty()) &&
                         categoryArrayMapping.find(item => item.category === getStatProperty()).array.length === 0) ||
