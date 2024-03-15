@@ -231,158 +231,157 @@ const CalculatorTestPage = () => {
 
 
     // FIXME: State doesnt update immediately, so we're using the previous state to update the points.
-    // FIXME: State doesnt update immediately, so we're using the previous state to update the points.
-const handleOnDrop = (e) => {
-    let _data = e.dataTransfer.getData("Card");
+    const handleOnDrop = (e) => {
+        let _data = e.dataTransfer.getData("Card");
 
-    if (selectedBox === null || selectedRadioBox === null) {
-        showErrorMessage("Please select Bat/Bowl and Ppl/Mo/Dth.");
-        e.preventDefault();
-        return;
-    }
-
-    let data = JSON.parse(_data);
-
-    // Add the card to DroppedCards[] if it doesn't already exist.
-    if (!droppedCards.some(player => player.playerName === data.playerName)) {
-        setDroppedCards([...droppedCards, data]);
-    }
-
-    // Add the card to the corresponding category array using the getStatProperty() function if it doesn't already exist
-    const prop = getStatProperty();
-    let playerExists = false;
-    let maxCardCountReached = false;
-
-    if (prop === "bat_ppl") {
-        playerExists = isCardInArray(data, batPplCards);
-        maxCardCountReached = hasExceededMaxCards("bat_ppl", batPplCards.length);
-        if (!playerExists && !maxCardCountReached) {
-            setBatPplCards([...batPplCards, data]);
+        if (selectedBox === null || selectedRadioBox === null) {
+            showErrorMessage("Please select Bat/Bowl and Ppl/Mo/Dth.");
+            e.preventDefault();
+            return;
         }
-    } else if (prop === "bat_mo") {
-        playerExists = isCardInArray(data, batMoCards);
-        maxCardCountReached = hasExceededMaxCards("bat_mo", batMoCards.length);
-        if (!playerExists && !maxCardCountReached) {
-            setBatMoCards([...batMoCards, data]);
-        }
-    } else if (prop === "bat_dth") {
-        playerExists = isCardInArray(data, batDthCards);
-        maxCardCountReached = hasExceededMaxCards("bat_dth", batDthCards.length);
-        if (!playerExists && !maxCardCountReached) {
-            setBatDthCards([...batDthCards, data]);
-        }
-    } else if (prop === "bow_ppl") {
-        playerExists = isCardInArray(data, bowPplCards);
-        maxCardCountReached = hasExceededMaxCards("bow_ppl", bowPplCards.length);
-        if (!playerExists && !maxCardCountReached) {
-            setBowPplCards([...bowPplCards, data]);
-        }
-    } else if (prop === "bow_mo") {
-        playerExists = isCardInArray(data, bowMoCards);
-        maxCardCountReached = hasExceededMaxCards("bow_mo", bowMoCards.length);
-        if (!playerExists && !maxCardCountReached) {
-            setBowMoCards([...bowMoCards, data]);
-        }
-    } else if (prop === "bow_dth") {
-        playerExists = isCardInArray(data, bowDthCards);
-        maxCardCountReached = hasExceededMaxCards("bow_dth", bowDthCards.length);
-        if (!playerExists && !maxCardCountReached) {
-            setBowDthCards([...bowDthCards, data]);
-        }
-    } else {
-        console.warn("Invalid property");
-        setErrMessage("Oops.. There's some unexpected issue. Please contact the administrator.")
-        e.preventDefault();
-        return;
-    }
-    if (maxCardCountReached) {
-        showErrorMessage("Max cards reached for this category");
-        e.preventDefault();
-        return;
-    }
 
-    if (playerExists) {
-        showErrorMessage("Player already selected in this category");
-        e.preventDefault();
-        return;
-    }
+        let data = JSON.parse(_data);
 
-    // POINT CALCULATION
-    // points = overall points + condition points + captincy points + chemistry points + underdog points
-    // We'll recalulate the points for the dropped cards and replace it with the current point to be accurate and avoid edge case handlings.
+        // Add the card to DroppedCards[] if it doesn't already exist.
+        if (!droppedCards.some(player => player.playerName === data.playerName)) {
+            setDroppedCards([...droppedCards, data]);
+        }
 
-    setDroppedCards(prevDroppedCards => {
-        let total_points = 0;
-        let overall_points = 0;
-        let conditional_points = 0;
-        let chemistry_points = 0;
-        let underdog_points = 0;
-        let captaincy_points = 0;
+        // Add the card to the corresponding category array using the getStatProperty() function if it doesn't already exist
+        const prop = getStatProperty();
+        let playerExists = false;
+        let maxCardCountReached = false;
 
-        // OVERALL POINTS
-        prevDroppedCards.forEach(player => {
-            overall_points += player.overall;
-            total_points += overall_points;
-        });
-
-        // CONDITION POINTS
-        maxCardCapacity.forEach(row => {
-            const { category, capacity } = row;
-            const sumStat = categorySum(category);
-            let percentage = sumStat / (capacity * 10);
-            if (percentage > 0.9 && percentage <= 1) {
-                conditional_points += 5;
-            } else if (percentage > 0.8 && percentage <= 0.9) {
-                conditional_points += 3;
-            } else if (percentage > 0.7 && percentage <= 0.8) {
-                conditional_points += 1;
+        if (prop === "bat_ppl") {
+            playerExists = isCardInArray(data, batPplCards);
+            maxCardCountReached = hasExceededMaxCards("bat_ppl", batPplCards.length);
+            if (!playerExists && !maxCardCountReached) {
+                setBatPplCards([...batPplCards, data]);
             }
-            total_points += conditional_points;
-        });
-
-        // UNDERDOG POINTS
-        const underdogPlayers = prevDroppedCards.filter(player => player.type === 'underdog');
-        underdogPlayers.forEach(player => {
-            underdog_points += player.underdogPts;
-            total_points += underdog_points;
-        });
-
-        // CHEMISTRY POINTS
-        prevDroppedCards.forEach((player, index) => {
-            for (let i = index + 1; i < prevDroppedCards.length; i++) {
-                if (player.playerChemistry === prevDroppedCards[i].playerChemistry)
-                    chemistry_points += 5;
+        } else if (prop === "bat_mo") {
+            playerExists = isCardInArray(data, batMoCards);
+            maxCardCountReached = hasExceededMaxCards("bat_mo", batMoCards.length);
+            if (!playerExists && !maxCardCountReached) {
+                setBatMoCards([...batMoCards, data]);
             }
-            total_points += chemistry_points;
-        });
-
-        // CAPTAINCY POINTS
-        prevDroppedCards.forEach(player => {
-            if (player.playerName === captainName) {
-                captaincy_points += player.captaincyRating;
-                total_points += captaincy_points;
+        } else if (prop === "bat_dth") {
+            playerExists = isCardInArray(data, batDthCards);
+            maxCardCountReached = hasExceededMaxCards("bat_dth", batDthCards.length);
+            if (!playerExists && !maxCardCountReached) {
+                setBatDthCards([...batDthCards, data]);
             }
-        });
+        } else if (prop === "bow_ppl") {
+            playerExists = isCardInArray(data, bowPplCards);
+            maxCardCountReached = hasExceededMaxCards("bow_ppl", bowPplCards.length);
+            if (!playerExists && !maxCardCountReached) {
+                setBowPplCards([...bowPplCards, data]);
+            }
+        } else if (prop === "bow_mo") {
+            playerExists = isCardInArray(data, bowMoCards);
+            maxCardCountReached = hasExceededMaxCards("bow_mo", bowMoCards.length);
+            if (!playerExists && !maxCardCountReached) {
+                setBowMoCards([...bowMoCards, data]);
+            }
+        } else if (prop === "bow_dth") {
+            playerExists = isCardInArray(data, bowDthCards);
+            maxCardCountReached = hasExceededMaxCards("bow_dth", bowDthCards.length);
+            if (!playerExists && !maxCardCountReached) {
+                setBowDthCards([...bowDthCards, data]);
+            }
+        } else {
+            console.warn("Invalid property");
+            setErrMessage("Oops.. There's some unexpected issue. Please contact the administrator.")
+            e.preventDefault();
+            return;
+        }
+        if (maxCardCountReached) {
+            showErrorMessage("Max cards reached for this category");
+            e.preventDefault();
+            return;
+        }
 
-        // Update the total points
-        setPoints(total_points);
+        if (playerExists) {
+            showErrorMessage("Player already selected in this category");
+            e.preventDefault();
+            return;
+        }
 
-        // Decreement the count of the player.
-        setAvailablePlayers(prevPlayers => prevPlayers.map(player => {
-            if (player.playerName === data.playerName) {
-                const updatedCount = player.count - 1;
-                if (updatedCount === 0) {
-                    return null;
-                } else {
-                    return { ...player, count: updatedCount };
+        // POINT CALCULATION
+        // points = overall points + condition points + captincy points + chemistry points + underdog points
+        // We'll recalulate the points for the dropped cards and replace it with the current point to be accurate and avoid edge case handlings.
+
+        setDroppedCards(prevDroppedCards => {
+            let total_points = 0;
+            let overall_points = 0;
+            let conditional_points = 0;
+            let chemistry_points = 0;
+            let underdog_points = 0;
+            let captaincy_points = 0;
+
+            // OVERALL POINTS
+            prevDroppedCards.forEach(player => {
+                overall_points += player.overall;
+                total_points += overall_points;
+            });
+
+            // CONDITION POINTS
+            maxCardCapacity.forEach(row => {
+                const { category, capacity } = row;
+                const sumStat = categorySum(category);
+                let percentage = sumStat / (capacity * 10);
+                if (percentage > 0.9 && percentage <= 1) {
+                    conditional_points += 5;
+                } else if (percentage > 0.8 && percentage <= 0.9) {
+                    conditional_points += 3;
+                } else if (percentage > 0.7 && percentage <= 0.8) {
+                    conditional_points += 1;
                 }
-            }
-            return player;
-        }).filter(Boolean)); // Filter out null values to remove the dropped card
+                total_points += conditional_points;
+            });
 
-        return prevDroppedCards;
-    });
-};
+            // UNDERDOG POINTS
+            const underdogPlayers = prevDroppedCards.filter(player => player.type === 'underdog');
+            underdogPlayers.forEach(player => {
+                underdog_points += player.underdogPts;
+                total_points += underdog_points;
+            });
+
+            // CHEMISTRY POINTS
+            prevDroppedCards.forEach((player, index) => {
+                for (let i = index + 1; i < prevDroppedCards.length; i++) {
+                    if (player.playerChemistry === prevDroppedCards[i].playerChemistry)
+                        chemistry_points += 5;
+                }
+                total_points += chemistry_points;
+            });
+
+            // CAPTAINCY POINTS
+            prevDroppedCards.forEach(player => {
+                if (player.playerName === captainName) {
+                    captaincy_points += player.captaincyRating;
+                    total_points += captaincy_points;
+                }
+            });
+
+            // Update the total points
+            setPoints(total_points);
+
+            // Decreement the count of the player.
+            setAvailablePlayers(prevPlayers => prevPlayers.map(player => {
+                if (player.playerName === data.playerName) {
+                    const updatedCount = player.count - 1;
+                    if (updatedCount === 0) {
+                        return null;
+                    } else {
+                        return { ...player, count: updatedCount };
+                    }
+                }
+                return player;
+            }).filter(Boolean)); // Filter out null values to remove the dropped card
+
+            return prevDroppedCards;
+        });
+    };
 
 
     const handleClearCards = () => {
