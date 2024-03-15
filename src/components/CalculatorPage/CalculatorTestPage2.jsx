@@ -1,5 +1,5 @@
 // TODO: Use a storage to store the points and their descriptions for validation at backend. maybe?
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
@@ -24,7 +24,7 @@ const CalculatorTestPage = () => {
     const [playerData, setPlayerData] = useState([]);
     const [availablePlayers, setAvailablePlayers] = useState([]);
     const [playerCards, setPlayerCards] = useState([]);
-    const [captainName, setCaptainName] = useState(null);
+    const [captain, setCaptain] = useState({});
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -321,7 +321,6 @@ const CalculatorTestPage = () => {
             // OVERALL POINTS
             prevDroppedCards.forEach(player => {
                 overall_points += player.overall;
-                total_points += overall_points;
             });
 
             // CONDITION POINTS
@@ -336,14 +335,13 @@ const CalculatorTestPage = () => {
                 } else if (percentage > 0.7 && percentage <= 0.8) {
                     conditional_points += 1;
                 }
-                total_points += conditional_points;
             });
 
+            // TODO: Check if this works
             // UNDERDOG POINTS
             const underdogPlayers = prevDroppedCards.filter(player => player.type === 'underdog');
             underdogPlayers.forEach(player => {
                 underdog_points += player.underdogPts;
-                total_points += underdog_points;
             });
 
             // CHEMISTRY POINTS
@@ -352,17 +350,17 @@ const CalculatorTestPage = () => {
                     if (player.playerChemistry === prevDroppedCards[i].playerChemistry)
                         chemistry_points += 5;
                 }
-                total_points += chemistry_points;
             });
 
             // CAPTAINCY POINTS
             prevDroppedCards.forEach(player => {
-                if (player.playerName === captainName) {
+                if (player.playerName === captain.playerName) {
                     captaincy_points += player.captaincyRating;
-                    total_points += captaincy_points;
                 }
             });
 
+            total_points = overall_points + conditional_points + chemistry_points + underdog_points + captaincy_points;
+            console.log(total_points, overall_points, conditional_points, chemistry_points, captaincy_points, underdog_points);
             // Update the total points
             setPoints(total_points);
 
@@ -435,10 +433,13 @@ const CalculatorTestPage = () => {
     };
 
     const handleConfirmCaptain = (player) => {
+        // add the captain score to the total points minus the previous captain score
+        console.log("Captain prev: ",captain.captaincyRating);
+        setPoints(prevPoints => prevPoints + player.captaincyRating - captain.captaincyRating);
+        setCaptain(player);
         console.log("Captain Player points: ", player.captaincyRating);
-        setCaptainName(player.playerName);
-        // TODO: Add captain bonus points to the total points when sumbitting to the API.
         setShowCapPopup(false);
+        // TODO: Add captain bonus points to the total points when sumbitting to the API.
     };
 
 
