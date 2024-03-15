@@ -1,5 +1,4 @@
-// TODO: Calculate points.
-// TODO: Use a storage to store the points and their descriptions for validation at backend.
+// TODO: Use a storage to store the points and their descriptions for validation at backend. maybe?
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -22,8 +21,6 @@ const CalculatorTestPage = () => {
 
     // Data
     const [points, setPoints] = useState(0);
-    const [bonusPoints, setBonusPoints] = useState(0);
-    // const [penaltyPoints, setPenaltyPoints] = useState(0);
     const [playerData, setPlayerData] = useState([]);
     const [availablePlayers, setAvailablePlayers] = useState([]);
     const [playerCards, setPlayerCards] = useState([]);
@@ -31,7 +28,7 @@ const CalculatorTestPage = () => {
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
 
     /////////////////////////////////////////////////////////////////////////////////////////////
-    const [pointsMemo, setPointsMemo] = useState({}); // Stores the points as well as the description of the points why they were added 
+    const [pointsMemo, setPointsMemo] = useState({}); // TODO: Stores the points as well as the description of the points why they were added 
     // Categories of Cards
     const [batPplCards, setBatPplCards] = useState([]);
     const [batMoCards, setBatMoCards] = useState([]);
@@ -215,6 +212,14 @@ const CalculatorTestPage = () => {
         return { message, allConditionsMet };
     };
 
+    const hasExceededMaxCards = (category, currentCardsCount) => {
+        const foundCategory = maxCardCapacity.find(item => item.category === category);
+        if (!foundCategory) {
+            return false;
+        }
+        return currentCardsCount >= foundCategory.capacity;
+    };
+
     function isCardInArray(card, array) {
         for (let i = 0; i < array.length; i++) {
             if (array[i].playerName === card.playerName) {
@@ -245,46 +250,53 @@ const CalculatorTestPage = () => {
         // Add the card to the corresponding category array using the getStatProperty() function if it doesn't already exist
         const prop = getStatProperty();
         let playerExists = false;
+        let maxCardCountReached = false;
 
         if (prop === "bat_ppl") {
             playerExists = isCardInArray(data, batPplCards);
-            if (!playerExists) {
+            maxCardCountReached = hasExceededMaxCards("bat_ppl", batPplCards.length);
+            if (!playerExists && !maxCardCountReached) {
                 setBatPplCards([...batPplCards, data]);
             }
-        }
-        else if (prop === "bat_mo") {
+        } else if (prop === "bat_mo") {
             playerExists = isCardInArray(data, batMoCards);
-            if (!playerExists) {
+            maxCardCountReached = hasExceededMaxCards("bat_mo", batMoCards.length);
+            if (!playerExists && !maxCardCountReached) {
                 setBatMoCards([...batMoCards, data]);
             }
-        }
-        else if (prop === "bat_dth") {
+        } else if (prop === "bat_dth") {
             playerExists = isCardInArray(data, batDthCards);
-            if (!playerExists) {
+            maxCardCountReached = hasExceededMaxCards("bat_dth", batDthCards.length);
+            if (!playerExists && !maxCardCountReached) {
                 setBatDthCards([...batDthCards, data]);
             }
-        }
-        else if (prop === "bow_ppl") {
+        } else if (prop === "bow_ppl") {
             playerExists = isCardInArray(data, bowPplCards);
-            if (!playerExists) {
+            maxCardCountReached = hasExceededMaxCards("bow_ppl", bowPplCards.length);
+            if (!playerExists && !maxCardCountReached) {
                 setBowPplCards([...bowPplCards, data]);
             }
-        }
-        else if (prop === "bow_mo") {
+        } else if (prop === "bow_mo") {
             playerExists = isCardInArray(data, bowMoCards);
-            if (!playerExists) {
+            maxCardCountReached = hasExceededMaxCards("bow_mo", bowMoCards.length);
+            if (!playerExists && !maxCardCountReached) {
                 setBowMoCards([...bowMoCards, data]);
             }
-        }
-        else if (prop === "bow_dth") {
+        } else if (prop === "bow_dth") {
             playerExists = isCardInArray(data, bowDthCards);
-            if (!playerExists) {
+            maxCardCountReached = hasExceededMaxCards("bow_dth", bowDthCards.length);
+            if (!playerExists && !maxCardCountReached) {
                 setBowDthCards([...bowDthCards, data]);
             }
         }
         else {
             console.warn("Invalid property");
             setErrMessage("Oops.. There's some unexpected issue. Please contact the administrator.")
+            e.preventDefault();
+            return;
+        }
+        if (maxCardCountReached) {
+            showErrorMessage("Max cards reached for this category");
             e.preventDefault();
             return;
         }
@@ -367,7 +379,6 @@ const CalculatorTestPage = () => {
         setSelectedBox(null);
         setSelectedRadioBox(null);
         setPoints(0);
-        setBonusPoints(0);
         setAvailablePlayers(playerData);
         setDroppedCards([]);
         setBatPplCards([]);
