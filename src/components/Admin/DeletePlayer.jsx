@@ -17,9 +17,9 @@ const DeletePlayer = () => {
 
     try {
       const response = await axios.post('http://localhost:3000/adminDeletePlayer', {
-        teamName,
         playerName,
-        slot
+        teamName,
+        slot: Number(slot)
       })
 
       console.log(`Submitted response : ${response.data}`);
