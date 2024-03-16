@@ -6,17 +6,14 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: black;
   }
-  
-  .home-button {
-    margin:0px;
-    background-color: #4caf50;
+
+  .h2 {
+    text-align: center;
+    margin-bottom: 20px;
     color: white;
-    padding: 10px 15px;
-    text-decoration: none;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    font-size: larger;
   }
   
   .form {
@@ -24,34 +21,54 @@
     flex-direction: column;
   }
   
-  label {
+  .label {
     margin-bottom: 10px;
   }
   
-  input {
+  .input {
     padding: 8px;
     margin-bottom: 10px;
     margin-left: 20px;
     color: black !important ;
   }
 
-  select {
+  .select {
     padding: 8px;
     margin-bottom: 10px;
     margin-left: 20px;
     color: black !important ;
   }
 
-  option {
+  .option {
     color : black;
   }
   
+
   .submit-button {
-    background-color: #008CBA;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+    background-color: #1bf146 !important;
+    color: white ;
+    padding: 10px 15px ;
+    border: none ;
+    border-radius: 4px ;
+    cursor: pointer ;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.radio-label {
+  margin-bottom: 10px;
+}
+
+.radio-input {
+  margin-right: 5px;
+}
+
+.radio-text {
+  margin-left: 5px;
+}
+
+
   

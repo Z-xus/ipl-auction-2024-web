@@ -1,12 +1,11 @@
 import React from 'react'
-import './Home.css'; 
 import AddPlayer from './AddPlayer'
 import DeletePlayer from './DeletePlayer'
 import ManagePowercard from './ManagePowercard'
 import AllocateTeam from './AllocateTeam'
 
-const Home = () => {
-  return ( 
+const AdminHome = () => {
+  return (
     <main>
       <AddPlayer />
       <DeletePlayer />
@@ -16,4 +15,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default AdminHome

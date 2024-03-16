@@ -1,18 +1,16 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import './style.css'; 
-
+import './style.css';
 
 const AddPlayer = () => {
   const [teamName, setTeamName] = useState('');
-  const [playerName, setplayerName] = useState('');
+  const [playerName, setPlayerName] = useState('');
   const [slot, setSlot] = useState('');
   const [price, setPrice] = useState('');
 
   const teamOptions = [
-    'CSK','DC','GT','KKR','LSG','MI','PBKS','RCB','RR','SRH'
+    'CSK', 'DC', 'GT', 'KKR', 'LSG', 'MI', 'PBKS', 'RCB', 'RR', 'SRH'
   ];
 
   const handleSubmit = async (e) => {
@@ -30,24 +28,24 @@ const AddPlayer = () => {
       setPrice('')
       setSlot('')
       setTeamName('')
-      setplayerName('')
+      setPlayerName('')
     } catch (error) {
       console.error('Error submitting form:', error);
     }
   };
 
   return (
-    <div className="add-player-container" style={{marginBottom : "2rem"}}> 
-      <h2>Add Player Form</h2>
+    <div className="add-player-container" style={{ marginBottom: "2rem" }}>
+      <h2 className='h2'>Add Player Form</h2>
 
       <form onSubmit={handleSubmit} className="form">
 
-      <label>
+        <label className='label'>
           Team Name:
-          <select value={teamName} onChange={(e) => setTeamName(e.target.value)} required>
-            <option value="">Select Team</option>
+          <select className='select' value={teamName} onChange={(e) => setTeamName(e.target.value)} required>
+            <option className='option' value="">Select Team</option>
             {teamOptions.map((team, index) => (
-              <option key={index} value={team}>
+              <option key={index} value={team} className='option'>
                 {team}
               </option>
             ))}
@@ -55,19 +53,19 @@ const AddPlayer = () => {
         </label>
 
         <br />
-        <label>
-          Player Name : 
-          <input type="text" value={playerName} onChange={(e) => setplayerName(e.target.value)} required />
+        <label className='label'>
+          Player Name :
+          <input className='input' type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} required />
         </label>
         <br />
-        <label>
-          Slot : 
-          <input type="text" value={slot} onChange={(e) => setSlot(e.target.value)} />
+        <label className='label'>
+          Slot :
+          <input className='input' type="text" value={slot} onChange={(e) => setSlot(e.target.value)} />
         </label>
         <br />
-        <label>
-          Price : 
-          <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} />
+        <label className='label'>
+          Price :
+          <input className='input' type="text" value={price} onChange={(e) => setPrice(e.target.value)} />
         </label>
         <br />
         <button type="submit" className="submit-button">Submit</button>
