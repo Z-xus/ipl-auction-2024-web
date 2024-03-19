@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './style.css';
 
+const SERVERURL = import.meta.env.VITE_SERVERURL;
+
 const DeletePlayer = () => {
   const [teamName, setTeamName] = useState('');
   const [playerName, setPlayerName] = useState('');
@@ -16,7 +18,7 @@ const DeletePlayer = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/adminDeletePlayer', {
+      const response = await axios.post(`${SERVERURL}/adminDeletePlayer`, {
         playerName,
         teamName,
         slot: Number(slot)

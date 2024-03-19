@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './style.css';
 
+const SERVERURL = import.meta.env.VITE_SERVERURL;
+
 const AddPlayer = () => {
   const [teamName, setTeamName] = useState('');
   const [playerName, setPlayerName] = useState('');
@@ -17,7 +19,7 @@ const AddPlayer = () => {
     e.preventDefault();
     try {
       // Make a POST request using Axios
-      const response = await axios.post('http://localhost:3000/adminAddPlayer', {
+      const response = await axios.post(`${SERVERURL}/adminAddPlayer`, {
         playerName,
         teamName,
         slot,
@@ -25,10 +27,10 @@ const AddPlayer = () => {
       });
 
       console.log('Server response:', response.data);
-      setPrice('')
-      setSlot('')
-      setTeamName('')
-      setPlayerName('')
+      setPrice('');
+      setSlot('');
+      setTeamName('');
+      setPlayerName('');
     } catch (error) {
       console.error('Error submitting form:', error);
     }

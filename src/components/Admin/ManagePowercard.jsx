@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './style.css';
 
+const SERVERURL = import.meta.env.VITE_SERVERURL;
+
 const ManagePowercardForm = () => {
   const [teamName, setTeamName] = useState('');
   const [slot, setSlot] = useState('');
@@ -19,7 +21,7 @@ const ManagePowercardForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/adminManagePowercard', {
+      const response = await axios.post(`${SERVERURL}/adminManagePowercard`, {
         teamName,
         slot,
         powercard: selectedPowercard,

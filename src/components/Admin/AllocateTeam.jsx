@@ -2,6 +2,8 @@ import './style.css';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+const SERVERURL = import.meta.env.VITE_SERVERURL;
+
 const AllocateTeam = () => {
   const [teamName, setTeamName] = useState('');
   const [userName, setUserName] = useState('');
