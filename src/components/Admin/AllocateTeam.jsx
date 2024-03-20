@@ -1,6 +1,6 @@
 import './style.css';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 
@@ -9,25 +9,44 @@ const AllocateTeam = () => {
   const [userName, setUserName] = useState('');
   const [slot, setSlot] = useState('');
   const [price, setPrice] = useState('');
+  const [response, setResponse] = useState(false);
 
   const teamOptions = [
     'CSK', 'DC', 'GT', 'KKR', 'LSG', 'MI', 'PBKS', 'RCB', 'RR', 'SRH'
   ];
 
-  const handleSubmit = (e) => {
+  const timeOut = () => {
+    setTimeout(() => {
+      setResponse(false)
+    }, 2000);
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle form submission logic here
+    const response = await axios.patch(`${SERVERURL}/adminAllocateTeam`, {
+      teamName,
+      username: userName,
+      slot: Number(slot),
+      price: Number(price)
+    })
+
     console.log('Form Submitted:', { teamName, userName, slot, price });
+    console.log(response.data.message);
     setPrice('')
     setSlot('')
     setTeamName('')
     setUserName('')
+    setResponse(true)
+    timeOut()
   };
 
   return (
     <div className="add-player-container" style={{ marginBottom: "2rem" }}>
 
       <h2 className='h2'>Allocate Team Form</h2>
+
+      {response && <h2> Success </h2>}
 
       <form onSubmit={handleSubmit} className='form'>
         <label className='label'>

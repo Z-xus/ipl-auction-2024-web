@@ -10,10 +10,17 @@ const AddPlayer = () => {
   const [playerName, setPlayerName] = useState('');
   const [slot, setSlot] = useState('');
   const [price, setPrice] = useState('');
+  const [response, setResponse] = useState(false);
 
   const teamOptions = [
     'CSK', 'DC', 'GT', 'KKR', 'LSG', 'MI', 'PBKS', 'RCB', 'RR', 'SRH'
   ];
+
+  const timeOut = () => {
+    setTimeout(() => {
+      setResponse(false)
+    }, 2000);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +38,8 @@ const AddPlayer = () => {
       setSlot('');
       setTeamName('');
       setPlayerName('');
+      setResponse(true)
+      timeOut();
     } catch (error) {
       console.error('Error submitting form:', error);
     }
@@ -39,6 +48,7 @@ const AddPlayer = () => {
   return (
     <div className="add-player-container" style={{ marginBottom: "2rem" }}>
       <h2 className='h2'>Add Player Form</h2>
+      {response && <h2 className='my-4'> Success </h2>}
 
       <form onSubmit={handleSubmit} className="form">
 

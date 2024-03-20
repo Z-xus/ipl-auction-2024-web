@@ -10,6 +10,7 @@ const ManagePowercardForm = () => {
   const [slot, setSlot] = useState('');
   const [selectedPowercard, setSelectedPowercard] = useState('');
   const [action, setAction] = useState('');
+  const [response, setResponse] = useState(false);
 
   const teamOptions = [
     'CSK', 'DC', 'GT', 'KKR', 'LSG', 'MI', 'PBKS', 'RCB', 'RR', 'SRH'
@@ -17,22 +18,38 @@ const ManagePowercardForm = () => {
 
   const powercardOptions = ["focus fire", "god's eye", "right to match", "double right to match", "silent reserve", "stealth bid"];
 
+  const timeOut = () => {
+    setTimeout(() => {
+      setResponse(false)
+    }, 2000);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${SERVERURL}/adminManagePowercard`, {
-        teamName,
-        slot,
-        powercard: selectedPowercard,
-        action
-      });
-
+      let response
+      if (action === 'add') {
+        response = await axios.post(`${SERVERURL}/adminAddPowercard`, {
+          teamName,
+          slot,
+          powercard: selectedPowercard,
+        });
+      }
+      else {
+        response = await axios.post(`${SERVERURL}/adminUsePowercard`, {
+          teamName,
+          slot,
+          powercard: selectedPowercard,
+        });
+      }
       console.log(response.data);
       setAction('');
       setSelectedPowercard('');
       setSlot('');
       setTeamName('');
+      setResponse(true);
+      timeOut();
     } catch (error) {
       console.log(error);
     }
@@ -41,6 +58,9 @@ const ManagePowercardForm = () => {
   return (
     <div className="add-player-container" style={{ marginBottom: "2rem" }}>
       <h2 className='h2'>Manage Powercard Form</h2>
+
+      {response && <h2 className='my-4'> Success </h2>}
+
       <form onSubmit={handleSubmit} className='form'>
         <label className='label'>
           Team Name:
