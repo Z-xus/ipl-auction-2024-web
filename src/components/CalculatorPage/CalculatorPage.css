@@ -30,7 +30,6 @@
 /* body  */
 .calculator 
 {
-    height: 100vh;
     backdrop-filter: blur(12.5px);
 }
 
