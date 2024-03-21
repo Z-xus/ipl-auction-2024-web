@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-// import Card from "./Card";
-import Arrow from "../../assets/arrow.svg";
+// import React from "react";
+import { useState } from "react";
 import CardFront from "./CardFront";
 
 const CaptaincyPopup = ({ message, onCancel, onConfirm, playerCards }) => {
@@ -45,7 +44,7 @@ const CaptaincyPopup = ({ message, onCancel, onConfirm, playerCards }) => {
                 />
                 {player === selectedCard && (
                   <div className="absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2">
-                    <img src={Arrow} className="w-10 h-10 relative left-16 bottom-3" alt="Arrow" />
+                    <img src={`/images/icons/arrow.svg`} className="w-10 h-10 relative left-16 bottom-3" alt="Arrow" />
                   </div>
                 )}
               </div>
