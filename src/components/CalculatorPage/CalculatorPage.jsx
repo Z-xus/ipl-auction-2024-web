@@ -1,12 +1,13 @@
-// TODO: Use a storage to store the points and their descriptions for validation at backend. maybe?
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar, Card, Popup, ConditionsBoard, CaptaincyPopup } from '../Utils';
+import io from 'socket.io-client';
 import { RadioBox, CardContainer, Box, Button } from './Utils.jsx';
 import './CalculatorPage.css';
 
 const SERVERURL = import.meta.env.VITE_SERVERURL;
+const socket = io(SERVERURL);
 
 const maxCardCapacity = [
     { category: "bat_ppl", capacity: 4 },
@@ -28,7 +29,7 @@ const CalculatorPage = () => {
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
 
     /////////////////////////////////////////////////////////////////////////////////////////////
-    const [pointsMemo, setPointsMemo] = useState({}); // TODO: Stores the points as well as the description of the points why they were added 
+    // const [pointsMemo, setPointsMemo] = useState({}); // TODO: Stores the points as well as the description of the points why they were added 
     // Categories of Cards
     const [batPplCards, setBatPplCards] = useState([]);
     const [batMoCards, setBatMoCards] = useState([]);
@@ -59,6 +60,9 @@ const CalculatorPage = () => {
     // Refresh
     const [username, setUsername] = useState(localStorage.getItem("username") || "");
     const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")) || []);
+    const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
+    const [team, setTeam] = useState(localStorage.getItem("team") || "");
+    const [isConnected, setIsConnected] = useState(socket.connected);
 
     const navigate = useNavigate();
 
@@ -93,6 +97,53 @@ const CalculatorPage = () => {
         fetchPlayerData();
 
     }, [players]);
+
+    useEffect(() => {
+        socket.on('connect', () => {
+            console.log("connected");
+            setIsConnected(true);
+        });
+
+        socket.on('disconnect', () => {
+            setIsConnected(false);
+        });
+
+        const handlePlayer = (data, action) => {
+            const newPlayerId = data.payload.playerID;
+            const newBudget = data.payload.budget;
+            setPlayers(prevPlayers => {
+                const playerIndex = prevPlayers.indexOf(newPlayerId);
+                if (playerIndex === -1 && action === "add") {
+                    const updatedPlayers = [...prevPlayers, newPlayerId];
+                    localStorage.setItem("players", JSON.stringify(updatedPlayers));
+                    localStorage.setItem("budget", JSON.stringify(newBudget));
+                    return updatedPlayers;
+                }
+                else if (playerIndex !== -1 && action === "delete") {
+                    const updatedPlayers = [...prevPlayers.slice(0, playerIndex), ...prevPlayers.slice(playerIndex + 1)];
+                    localStorage.setItem("players", JSON.stringify(updatedPlayers));
+                    localStorage.setItem("budget", JSON.stringify(newBudget));
+                    return updatedPlayers;
+                }
+                return prevPlayers;
+            });
+        };
+
+        socket.on(`playerAdded${team}${slot}`, data => handlePlayer(data, "add"));
+        socket.on(`playerDeleted${team}${slot}`, data => handlePlayer(data, "delete"));
+        socket.on(`teamAllocate${username}${slot}`, (data) => {
+            const teamData = data.payload;
+            localStorage.setItem("team", teamData.teamName);
+            localStorage.setItem("budget", teamData.budget);
+        });
+
+        return () => {
+            socket.off('connect');
+            socket.off('disconnect');
+            socket.off('pong');
+        };
+    }, [username, team, slot]);
+
 
     const handleBoxSelect = (boxId) => {
         setSelectedBox(boxId);
@@ -230,7 +281,6 @@ const CalculatorPage = () => {
     }
 
 
-    // TODO: how to add the Captaincy points on droping of cards?
     const handleOnDrop = (e) => {
         let _data = e.dataTransfer.getData("Card");
 
@@ -349,8 +399,6 @@ const CalculatorPage = () => {
                 }
             });
 
-            // TODO: Move to submit.
-
             // CHEMISTRY POINTS
             prevDroppedCards.forEach((player, index) => {
                 for (let i = index + 1; i < prevDroppedCards.length; i++) {
@@ -412,14 +460,28 @@ const CalculatorPage = () => {
         setBowDthCards([]);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setShowPopup(true);
         let u_points = underdogCalculation();
         setPoints(prev => prev + u_points);
         console.log("Underdog Points: " + u_points);
         if (u_points === 0) setSubmitMsg(`Your total points are ${points}\nAre you sure you want to submit?`);
         else setSubmitMsg(`Your bonus points are ${u_points} Your total points are ${points} Are you sure you want to submit?`);
-        // TODO: Submit the data to the API.
+        try {
+            const response = await axios.post(`${SERVERURL}/calculator`, {
+                teamName: team,
+                slot: parseInt(slot),
+                score: points
+            });
+            console.log("Username: " + username, " Team: " + team, " Slot: " + slot, " Points: " + points);
+            console.log(response.data);
+            if (response.data.message === "Score updated successfully") 
+               console.log("Score updated successfully");
+            else 
+               console.log("There was an error updating score.");
+        } catch (error) {
+            console.error('Error submitting data:', error);
+        }
     };
 
     const handleCaptain = () => {
@@ -450,18 +512,18 @@ const CalculatorPage = () => {
     };
 
     const handleConfirmCaptain = (player) => {
-        // add the captain score to the total points minus the previous captain score
         setCaptain(player);
         console.log("Captain Player points: ", player.captaincyRating);
         setShowCapPopup(false);
-        // TODO: Add captain bonus points to the total points when sumbitting to the API.
     };
 
 
     return (
         <div className="calculator">
             <Navbar />
-            {/* TODO: Submit total pts to api when user presses confirm btn */}
+            {
+                // TODO: Refine the UI/UX.
+            }
             {showErrPopup && <Popup message={errMessage} isOK={true} onCancel={null} onConfirm={handleCloseErrPopup} />}
 
             {showPopup && <Popup message={submitMsg} isOK={false} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
@@ -478,6 +540,7 @@ const CalculatorPage = () => {
                     Total Points: {points}
                 </div>
                 {
+                    // NOTE: not important
                     // TODO: What to do with this?..
                     // <h1 className="font-bold uppercase underline text-4xl inline">Calculator</h1>
                 }
