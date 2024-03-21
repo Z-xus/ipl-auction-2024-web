@@ -30,7 +30,7 @@ const DeletePowercardForm = () => {
         powercard: selectedPowercard,
       });
 
-      setResMsg(`Server response: ${response.data}`);
+      setResMsg(response.data.message);
       setMsgDisplay(true);
       setTeamName('');
       setSelectedPowercard('');

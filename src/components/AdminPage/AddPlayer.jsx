@@ -11,10 +11,9 @@ const AddPlayerForm = () => {
   const [teamName, setTeamName] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [slot, setSlot] = useState('');
-
+  const [price, setPrice] = useState('');
   const [msgDisplay, setMsgDisplay] = useState(false);
   const [resMsg, setResMsg] = useState('');
-  const [price, setPrice] = useState('');
 
   const timeOut = () => {
     setTimeout(() => {
@@ -32,7 +31,7 @@ const AddPlayerForm = () => {
         price: Number(price),
       });
 
-      setResMsg(`Server response: ${response.data}`);
+      setResMsg(response.data.message);
       setMsgDisplay(true);
       setPlayerName('');
       setTeamName('');

@@ -31,7 +31,7 @@ const AllocateTeamForm = () => {
         price: Number(price),
       });
 
-      setResMsg(`Server response: ${response.data}`);
+      setResMsg(response.data.message);
       setMsgDisplay(true);
       setUsername('');
       setTeamName('');

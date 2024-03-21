@@ -29,7 +29,7 @@ const DeletePlayerForm = () => {
         slot: Number(slot)
       });
 
-      setResMsg(`Server response: ${response.data}`);
+      setResMsg(response.data.message);
       setMsgDisplay(true);
       setPlayerName('');
       setTeamName('');
