@@ -5,11 +5,11 @@ function numberConvert(number) {
   let sign = Math.sign(num);
 
   if (num >= 1e7)
-    return `${sign * (num / 1e7).toFixed(1)} CR`;
+    return `${sign * (num / 1e7).toFixed(2)} CR`;
   else if (num >= 1e5)
-    return `${sign * (num / 1e5).toFixed(1)} L`;
+    return `${sign * (num / 1e5).toFixed(2)} L`;
   else if (num >= 1e3)
-    return `${sign * (num / 1e3).toFixed(1)} K`;
+    return `${sign * (num / 1e3).toFixed(2)} K`;
   else
     return (sign * num).toString();
 }

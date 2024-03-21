@@ -1,0 +1,77 @@
+.admin-form-container {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 0 auto;
+  margin-bottom: 2rem;
+  padding: 20px;
+  background-color: black;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.h2 {
+  margin-bottom: 20px;
+  font-size: larger;
+  color: white;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  margin-bottom: 10px;
+}
+
+.input {
+  margin-bottom: 10px;
+  margin-left: 20px;
+  padding: 8px;
+  color: black !important;
+}
+
+.response-text {
+  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+  color: white;
+  text-align: center;
+}
+
+.select {
+  margin-bottom: 10px;
+  margin-left: 20px;
+  padding: 8px;
+  color: black !important;
+}
+
+.option {
+  color: black;
+}
+
+.submit-button {
+  padding: 10px 15px;
+  background-color: #1bf146 !important;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  color: white;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.radio-label {
+  margin-bottom: 10px;
+}
+
+.radio-input {
+  margin-right: 5px;
+}
+
+.radio-text {
+  margin-left: 5px;
+}
