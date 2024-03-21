@@ -8,6 +8,7 @@ const SERVERURL = import.meta.env.VITE_SERVERURL;
 const TEAMS = ["CSK", "DC", "GT", "KKR", "LSG", "MI", "PBKS", "RCB", "RR", "SRH"];
 
 const AllocateTeamForm = () => {
+  const [adminUsername, setAdminUsername] = useState(localStorage.getItem('username') || '');
   const [teamName, setTeamName] = useState('');
   const [username, setUsername] = useState('');
   const [slot, setSlot] = useState('');
@@ -25,6 +26,7 @@ const AllocateTeamForm = () => {
     e.preventDefault();
     try {
       const response = await axios.patch(`${SERVERURL}/adminAllocateTeam`, {
+        adminUsername,
         teamName,
         username,
         slot: Number(slot),

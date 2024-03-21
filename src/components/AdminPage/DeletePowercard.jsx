@@ -9,6 +9,7 @@ const TEAMS = ["CSK", "DC", "GT", "KKR", "LSG", "MI", "PBKS", "RCB", "RR", "SRH"
 const POWERCARDS = ["focus fire", "god's eye", "right to match", "double right to match", "silent reserve", "stealth bid"];
 
 const DeletePowercardForm = () => {
+  const [adminUsername, setAdminUsername] = useState(localStorage.getItem('username') || '');
   const [teamName, setTeamName] = useState('');
   const [slot, setSlot] = useState('');
   const [selectedPowercard, setSelectedPowercard] = useState('');
@@ -25,6 +26,7 @@ const DeletePowercardForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${SERVERURL}/adminUsePowercard`, {
+        adminUsername,
         teamName,
         slot: Number(slot),
         powercard: selectedPowercard,

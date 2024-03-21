@@ -8,6 +8,7 @@ const SERVERURL = import.meta.env.VITE_SERVERURL;
 const TEAMS = ["CSK", "DC", "GT", "KKR", "LSG", "MI", "PBKS", "RCB", "RR", "SRH"];
 
 const DeletePlayerForm = () => {
+  const [adminUsername, setAdminUsername] = useState(localStorage.getItem('username') || '');
   const [teamName, setTeamName] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [slot, setSlot] = useState('');
@@ -24,6 +25,7 @@ const DeletePlayerForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${SERVERURL}/adminDeletePlayer`, {
+        adminUsername,
         playerName,
         teamName,
         slot: Number(slot)
