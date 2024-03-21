@@ -90,9 +90,12 @@ const DashboardPage = () => {
     socket.on(`playerDeleted${team}${slot}`, data => handlePlayer(data, "delete"));
 
     const handlePowercard = (data) => {
-      const updatedPowercards = data.payload;
-      localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
+      const updatedPowercards = data.payload.powercards;
+      const newBudget = data.payload.budget;
       setPowercards(updatedPowercards);
+      localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
+      setBudget(newBudget);
+      localStorage.setItem("budget", JSON.stringify(newBudget));
     };
 
     socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
