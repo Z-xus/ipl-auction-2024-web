@@ -8,6 +8,7 @@ const SERVERURL = import.meta.env.VITE_SERVERURL;
 const TEAMS = ["CSK", "DC", "GT", "KKR", "LSG", "MI", "PBKS", "RCB", "RR", "SRH"];
 
 const AddPlayerForm = () => {
+  const [adminUsername, setAdminUsername] = useState(localStorage.getItem('username') || '');
   const [teamName, setTeamName] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [slot, setSlot] = useState('');
@@ -17,7 +18,7 @@ const AddPlayerForm = () => {
 
   const timeOut = () => {
     setTimeout(() => {
-      setMsgDisplay(false); 
+      setMsgDisplay(false);
     }, 10000);
   };
 
@@ -25,6 +26,7 @@ const AddPlayerForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${SERVERURL}/adminAddPlayer`, {
+        adminUsername,
         playerName,
         teamName,
         slot: Number(slot),

@@ -9,6 +9,7 @@ const TEAMS = ["CSK", "DC", "GT", "KKR", "LSG", "MI", "PBKS", "RCB", "RR", "SRH"
 const POWERCARDS = ["focus fire", "god's eye", "right to match", "double right to match", "silent reserve", "stealth bid"];
 
 const AddPowercardForm = () => {
+  const [adminUsername, setAdminUsername] = useState(localStorage.getItem('username') || '');
   const [teamName, setTeamName] = useState('');
   const [slot, setSlot] = useState('');
   const [selectedPowercard, setSelectedPowercard] = useState('');
@@ -26,6 +27,7 @@ const AddPowercardForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${SERVERURL}/adminAddPowercard`, {
+        adminUsername,
         teamName,
         slot: Number(slot),
         powercard: selectedPowercard,
