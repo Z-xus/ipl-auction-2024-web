@@ -10,17 +10,17 @@
 }
 
 .legend {
-  border: .2rem solid gold;
-  box-shadow: 0 0 50px gold;
+  border: .2rem solid #e19d28;
+  box-shadow: 0 0 25px #e19d28;
 }
 
 .elite{
-  border: .2rem solid rgb(195, 24, 69);
-  box-shadow: 0 0 50px rgb(195, 24, 69);
+  border: .2rem solid rgb(123, 16, 41);
+  box-shadow: 0 0 75px rgb(123, 16, 41);
 }
 
 .women{
-  border: .2rem solid hotpink;
+  border: .2rem solid rgb(174, 60, 222);
 }
 
 .card-front,
