@@ -354,7 +354,7 @@ const CalculatorPage = () => {
             // CHEMISTRY POINTS
             prevDroppedCards.forEach((player, index) => {
                 for (let i = index + 1; i < prevDroppedCards.length; i++) {
-                    if (player.playerChemistry === prevDroppedCards[i].playerChemistry) {
+                    if (player.playerChemistry && (player.playerChemistry === prevDroppedCards[i].playerChemistry)) {
                         chemistry_points += 5;
                     }
                 }
