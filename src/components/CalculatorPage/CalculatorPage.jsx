@@ -362,8 +362,6 @@ const CalculatorPage = () => {
             return;
         }
 
-        // TODO: Penalty deduction 
-
         // POINT CALCULATION
         // points = overall points + condition points + captincy points + chemistry points + underdog points
         // We'll recalulate the points for the dropped cards and replace it with the current point to be accurate and avoid edge case handlings.
@@ -375,11 +373,6 @@ const CalculatorPage = () => {
             let chemistry_points = 0;
             let underdog_points = 0;
             let captaincy_points = 0;
-
-            // OVERALL POINTS
-            prevDroppedCards.forEach(player => {
-                overall_points += player.overall;
-            });
 
             // CONDITION POINTS
             maxCardCapacity.forEach(row => {
@@ -405,24 +398,27 @@ const CalculatorPage = () => {
                 }
             });
 
-            // CHEMISTRY POINTS
             prevDroppedCards.forEach((player, index) => {
+                // OVERALL POINTS
+                overall_points += player.overall;
+                // CHEMISTRY POINTS
                 for (let i = index + 1; i < prevDroppedCards.length; i++) {
-                    if (player.playerChemistry === prevDroppedCards[i].playerChemistry) {
+                    let sameChemistry = player.playerChemistry === prevDroppedCards[i].playerChemistry;
+                    let undefinedChemistry = player.playerChemistry === undefined || prevDroppedCards[i].playerChemistry === undefined;
+                    let samePlayer = player.playerName === prevDroppedCards[i].playerName;
+                    if (sameChemistry && !undefinedChemistry && !samePlayer) {
                         chemistry_points += 5;
+                        console.log(player.playerName + " and " + prevDroppedCards[i].playerName + " have chemistry points " + player.playerChemistry);
                     }
                 }
-            });
-
-            // CAPTAINCY POINTS
-            prevDroppedCards.forEach(player => {
+                // CAPTAINCY POINTS
                 if (player.playerName === captain.playerName) {
                     captaincy_points += player.captaincyRating;
                 }
             });
 
             total_points = overall_points + conditional_points + chemistry_points + underdog_points + captaincy_points;
-            // console.log("Total Points " + total_points + " Overall Points: " + overall_points + " Conditional Points: " + conditional_points + " Chemistry Points: " + chemistry_points + " Underdog Points: " + underdog_points + " Captaincy Points: " + captaincy_points);
+            console.log("Total Points " + total_points + " Overall Points: " + overall_points + " Conditional Points: " + conditional_points + " Chemistry Points: " + chemistry_points + " Underdog Points: " + underdog_points + " Captaincy Points: " + captaincy_points);
             setPoints(total_points);
 
             // Decreement the count of the player.
@@ -441,16 +437,6 @@ const CalculatorPage = () => {
             return prevDroppedCards;
         });
     };
-
-    const underdogCalculation = () => {
-        let underdog_points = 0;
-        const underdogPlayers = droppedCards.filter(player => player.gender === 'underdog');
-        underdogPlayers.forEach(player => {
-            underdog_points += player.underdogPts;
-        });
-        return underdog_points;
-    };
-
 
     const handleClearCards = () => {
         setSelectedBox(null);
@@ -480,10 +466,10 @@ const CalculatorPage = () => {
             });
             // console.log("Username: " + username, " Team: " + team, " Slot: " + slot, " Points: " + points, " Penalty: " + penalty);
             // TODO: Display these in popups.
-            if (response.data.message === "Score updated successfully") 
-               console.log("Score updated successfully");
-            else 
-               console.log("There was an error updating score.");
+            if (response.data.message === "Score updated successfully")
+                console.log("Score updated successfully");
+            else
+                console.log("There was an error updating score.");
         } catch (error) {
             console.error('Error submitting data:', error);
         }
@@ -519,6 +505,54 @@ const CalculatorPage = () => {
     const handleConfirmCaptain = (player) => {
         setCaptain(player);
         console.log("Captain Player points: ", player.captaincyRating);
+        // I know this is not the best way to do this, but I'm running out of luck this time.
+        // We'll recalculate, extracting calculation logic into a function breaks it, because, react.
+        let total_points = 0;
+        let overall_points = 0, conditional_points = 0, chemistry_points = 0, underdog_points = 0, captaincy_points = 0;
+
+        // CONDITION POINTS
+        maxCardCapacity.forEach(row => {
+            const { category, capacity } = row;
+            let sumStat = categorySum({
+                category: category,
+                batPplCards: batPplCards,
+                batMoCards: batMoCards,
+                batDthCards: batDthCards,
+                bowPplCards: bowPplCards,
+                bowMoCards: bowMoCards,
+                bowDthCards: bowDthCards
+            });
+            // Hack is not needed here, because the card is already added to the state.
+            let percentage = sumStat / (capacity * 10);
+            if (percentage > 0.9 && percentage <= 1) {
+                conditional_points += 5;
+            } else if (percentage > 0.8 && percentage <= 0.9) {
+                conditional_points += 3;
+            } else if (percentage > 0.7 && percentage <= 0.8) {
+                conditional_points += 1;
+            }
+        });
+
+        droppedCards.forEach((player, index) => {
+            // OVERALL POINTS
+            overall_points += player.overall;
+            // CHEMISTRY POINTS
+            for (let i = index + 1; i < droppedCards.length; i++) {
+                let sameChemistry = player.playerChemistry === droppedCards[i].playerChemistry;
+                let undefinedChemistry = player.playerChemistry === undefined || droppedCards[i].playerChemistry === undefined;
+                let samePlayer = player.playerName === droppedCards[i].playerName;
+                if (sameChemistry && !undefinedChemistry && !samePlayer) {
+                    chemistry_points += 5;
+                }
+            }
+        });
+
+        // CAPTAINCY POINTS - no need to loop through the dropped cards.
+        captaincy_points = player.captaincyRating;
+
+        total_points = overall_points + conditional_points + chemistry_points + underdog_points + captaincy_points;
+        // console.log("Total Points " + total_points + " Overall Points: " + overall_points + " Conditional Points: " + conditional_points + " Chemistry Points: " + chemistry_points + " Underdog Points: " + underdog_points + " Captaincy Points: " + captaincy_points);
+        setPoints(total_points);
         setShowCapPopup(false);
     };
 
