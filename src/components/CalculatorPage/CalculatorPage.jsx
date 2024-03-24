@@ -1,3 +1,7 @@
+// TODO: FIX POPUPS.
+// TODO: Show points according to captain and the current captain
+// TODO: Show conditional Board.
+// TODO: Remove underdog addition.
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,6 +12,7 @@ import './CalculatorPage.css';
 
 const SERVERURL = import.meta.env.VITE_SERVERURL;
 const socket = io(SERVERURL);
+const PENALTY_PER_VIOLATION = 100;
 
 const maxCardCapacity = [
     { category: "bat_ppl", capacity: 4 },
@@ -24,7 +29,6 @@ const CalculatorPage = () => {
     const [points, setPoints] = useState(0);
     const [playerData, setPlayerData] = useState([]);
     const [availablePlayers, setAvailablePlayers] = useState([]);
-    const [playerCards, setPlayerCards] = useState([]);
     const [captain, setCaptain] = useState({});
     const [conditionsBoardMessage, setConditionsBoardMessage] = useState('');
 
@@ -55,7 +59,7 @@ const CalculatorPage = () => {
     const [selectedBox, setSelectedBox] = useState(null);
     const [selectedRadioBox, setSelectedRadioBox] = useState(null);
     const [errMessage, setErrMessage] = useState("");
-    const [showScoreboard, setShowScoreboard] = useState(false);
+    const [showConditionsBoard, setShowConditionsBoard] = useState(false);
     const [submitMsg, setSubmitMsg] = useState("");
     // Refresh
     const [username, setUsername] = useState(localStorage.getItem("username") || "");
@@ -73,7 +77,7 @@ const CalculatorPage = () => {
 
 
     useEffect(() => {
-        const fetchPlayerData = async () => {
+        (async () => {
             try {
                 const playerPromises = players.map(async (playerID) => {
                     const response = await axios.post(`${SERVERURL}/getPlayer`, { _id: playerID }, { headers: { "Content-Type": "application/json" } });
@@ -82,19 +86,16 @@ const CalculatorPage = () => {
 
                 const resolvedPlayers = await Promise.all(playerPromises);
 
-                // Initialize counts for player cards
                 const newPlayerData = resolvedPlayers.map(player => ({
                     ...player,
                     count: (player.type === "All Rounder") ? 4 : 2
                 }));
                 setAvailablePlayers(newPlayerData);
                 setPlayerData(newPlayerData);
-                // setDroppedCards(newPlayerData);
             } catch (error) {
                 console.error('Error fetching player data:', error);
             }
-        };
-        fetchPlayerData();
+        })();
 
     }, [players]);
 
@@ -213,7 +214,6 @@ const CalculatorPage = () => {
         return sum;
     };
 
-    // Function to validate all conditions and generate a message
     const validatePlayerConditions = () => {
         const counts = {
             "Batsman": 0,
@@ -226,13 +226,16 @@ const CalculatorPage = () => {
             "legendary": 0
         };
 
-        playerCards.forEach(card => {
+        droppedCards.forEach(card => {
             counts[card.type]++;
             if (card.gender === 'female') {
                 counts['women']++;
             }
             if (card.gender === 'legendary') {
                 counts['legendary']++;
+            }
+            if (card.flag !== "ind") {
+                counts['foreign']++;
             }
         });
 
@@ -249,10 +252,13 @@ const CalculatorPage = () => {
 
         let message = [];
         let allConditionsMet = true;
+        let penalty = 0;
         for (const type in conditions) {
             const { min, max } = conditions[type];
             const count = counts[type];
             const conditionMet = count >= min && count <= max;
+            const minConditionMet = count >= min;
+            penalty += minConditionMet ? 0 : PENALTY_PER_VIOLATION; // TODO: Log this in pointsMemo
             const status = conditionMet ? '✅' : '❌';
             message.push(`${type}:,${min},${max},${count},${status}`);
             if (!conditionMet) {
@@ -260,7 +266,7 @@ const CalculatorPage = () => {
             }
         }
 
-        return { message, allConditionsMet };
+        return { message, allConditionsMet, penalty };
     };
 
     const hasExceededMaxCards = (category, currentCardsCount) => {
@@ -402,7 +408,7 @@ const CalculatorPage = () => {
             // CHEMISTRY POINTS
             prevDroppedCards.forEach((player, index) => {
                 for (let i = index + 1; i < prevDroppedCards.length; i++) {
-                    if (player.playerChemistry && (player.playerChemistry === prevDroppedCards[i].playerChemistry)) {
+                    if (player.playerChemistry === prevDroppedCards[i].playerChemistry) {
                         chemistry_points += 5;
                     }
                 }
@@ -416,7 +422,7 @@ const CalculatorPage = () => {
             });
 
             total_points = overall_points + conditional_points + chemistry_points + underdog_points + captaincy_points;
-            console.log("Total Points " + total_points + " Overall Points: " + overall_points + " Conditional Points: " + conditional_points + " Chemistry Points: " + chemistry_points + " Underdog Points: " + underdog_points + " Captaincy Points: " + captaincy_points);
+            // console.log("Total Points " + total_points + " Overall Points: " + overall_points + " Conditional Points: " + conditional_points + " Chemistry Points: " + chemistry_points + " Underdog Points: " + underdog_points + " Captaincy Points: " + captaincy_points);
             setPoints(total_points);
 
             // Decreement the count of the player.
@@ -461,20 +467,19 @@ const CalculatorPage = () => {
     };
 
     const handleSubmit = async () => {
-        setShowPopup(true);
-        let u_points = underdogCalculation();
-        setPoints(prev => prev + u_points);
-        console.log("Underdog Points: " + u_points);
-        if (u_points === 0) setSubmitMsg(`Your total points are ${points}\nAre you sure you want to submit?`);
-        else setSubmitMsg(`Your bonus points are ${u_points} Your total points are ${points} Are you sure you want to submit?`);
+        setShowSubmitPopup(true);
+        const { message, allConditionsMet, penalty } = validatePlayerConditions();
+        // Show the conditions board.
+        setSubmitMsg(`Your total points are ${points}\nAre you sure you want to submit?`);
         try {
             const response = await axios.post(`${SERVERURL}/calculator`, {
                 teamName: team,
                 slot: parseInt(slot),
-                score: points
+                score: points,
+                penalty: penalty
             });
-            console.log("Username: " + username, " Team: " + team, " Slot: " + slot, " Points: " + points);
-            console.log(response.data);
+            // console.log("Username: " + username, " Team: " + team, " Slot: " + slot, " Points: " + points, " Penalty: " + penalty);
+            // TODO: Display these in popups.
             if (response.data.message === "Score updated successfully") 
                console.log("Score updated successfully");
             else 
@@ -493,12 +498,12 @@ const CalculatorPage = () => {
     };
 
     // Popup logic.
-    const [showPopup, setShowPopup] = useState(false);
+    const [showSubmitPopup, setShowSubmitPopup] = useState(false);
     const [showErrPopup, setErrShowPopup] = useState(false);
     const [showCapPopup, setShowCapPopup] = useState(false);
     // const handleShowPopup = () => {setShowPopup(true);};
     const handleClosePopup = () => {
-        setShowPopup(false);
+        setShowSubmitPopup(false);
     };
     const handleCloseErrPopup = () => {
         setErrShowPopup(false);
@@ -508,7 +513,7 @@ const CalculatorPage = () => {
     };
 
     const handleCloseConditionsboard = () => {
-        setShowScoreboard(false);
+        setShowConditionsBoard(false);
     };
 
     const handleConfirmCaptain = (player) => {
@@ -526,9 +531,9 @@ const CalculatorPage = () => {
             }
             {showErrPopup && <Popup message={errMessage} isOK={true} onCancel={null} onConfirm={handleCloseErrPopup} />}
 
-            {showPopup && <Popup message={submitMsg} isOK={false} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
+            {showSubmitPopup && <Popup message={submitMsg} isOK={false} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
 
-            {showScoreboard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
+            {showConditionsBoard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
 
             {showCapPopup && <CaptaincyPopup playerCards={droppedCards} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
 
