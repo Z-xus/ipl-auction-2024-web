@@ -1,8 +1,7 @@
-// import React from "react";
 import { useState } from "react";
 import CardFront from "./CardFront";
 
-const CaptaincyPopup = ({ message, onCancel, onConfirm, playerCards }) => {
+const CaptaincyPopup = ({ message, onCancel, onConfirm, playerCards, currentCaptain }) => {
   const [selectedCard, setSelectedCard] = useState(null);
 
   const handleSelectCard = (cardData) => {
@@ -42,9 +41,14 @@ const CaptaincyPopup = ({ message, onCancel, onConfirm, playerCards }) => {
                   isSelected={player === selectedCard}
                   onSelect={() => handleSelectCard(player)}
                 />
+                {player.playerName === currentCaptain.playerName && (
+                  <div className="absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2">
+                    <img src={`/images/icons/arrow.svg`} className="w-10 h-10 relative text-red left-16 bottom-3" alt="White Arrow" />
+                  </div>
+                )}
                 {player === selectedCard && (
                   <div className="absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2">
-                    <img src={`/images/icons/arrow.svg`} className="w-10 h-10 relative left-16 bottom-3" alt="Arrow" />
+                    <img src={`/images/icons/arrow-colored.svg`} className="w-10 h-10 relative left-16 text-white bottom-3" alt="Blue Arrow" />
                   </div>
                 )}
               </div>

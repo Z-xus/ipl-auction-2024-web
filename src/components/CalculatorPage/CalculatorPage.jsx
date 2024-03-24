@@ -1,7 +1,6 @@
 // TODO: FIX POPUPS.
-// TODO: Show points according to captain and the current captain
+// TODO: Highlight the current Captain.
 // TODO: Show conditional Board.
-// TODO: Remove underdog addition.
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -569,7 +568,7 @@ const CalculatorPage = () => {
 
             {showConditionsBoard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
 
-            {showCapPopup && <CaptaincyPopup playerCards={droppedCards} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
+            {showCapPopup && <CaptaincyPopup playerCards={droppedCards} currentCaptain={captain} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
 
             <div className="main-title flex justify-between px-4 py-4 items-center">
                 <div className="total-points text-2xl inline py-4 px-6">

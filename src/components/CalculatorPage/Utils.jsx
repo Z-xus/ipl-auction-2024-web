@@ -79,19 +79,6 @@ export const CardContainer = ({ cardData }) => {
     );
 };
 
-// We don't need this container afterall. Just used once
-// export const CardContainer = ({ cardData }) => {
-//     return (
-//         <ul className="flex overflow-x-scroll items-center list-none gap-3 p-2 px-3">
-//             {!cardData.length === 0 && <span className="avail-player-text text-xl mx-4">Available Players Are Displayed here.</span>}
-//             {
-//                 cardData.map((card, index) => (
-//                     <Card key={index} data={card} />
-//                 ))}
-//         </ul>
-//     );
-// };
-
 export const RadioBox = ({ id, label, isSelected, onSelect }) => {
     const handleRadioClick = () => {
         onSelect(id);
