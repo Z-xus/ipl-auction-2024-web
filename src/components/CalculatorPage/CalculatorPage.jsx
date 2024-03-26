@@ -1,4 +1,4 @@
-// TODO: FIX POPUPS.
+// TODO: FIX POPUPS. - Submit and Error
 // TODO: Highlight the current Captain.
 // TODO: Show conditional Board.
 import { useEffect, useState } from 'react';
