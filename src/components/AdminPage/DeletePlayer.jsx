@@ -98,19 +98,19 @@ const DeletePlayerForm = () => {
               required
             />
             {/* Display suggestions only when input is active */}
-            {inputActive && (
-              <div className="suggestions">
-                {suggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    className="suggestion"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {suggestion}
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* {inputActive && ( */}
+            <div className="suggestions">
+              {suggestions.map((suggestion, index) => (
+                <div
+                  key={index}
+                  className="suggestion"
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  {suggestion}
+                </div>
+              ))}
+            </div>
+            {/* )} */}
           </label>
           <br />
           <label className='label'>
