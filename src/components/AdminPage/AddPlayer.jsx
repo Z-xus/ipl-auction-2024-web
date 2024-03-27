@@ -67,7 +67,9 @@ const AddPlayerForm = () => {
   };
 
   const handleInputBlur = () => {
-    setInputActive(false);
+    setTimeout(() => {
+      setInputActive(false);
+    }, 100);
   };
 
   return (
