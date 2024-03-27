@@ -34,7 +34,6 @@ const LoginPage = () => {
       localStorage.setItem("budget", data.user.budget);
       localStorage.setItem("players", JSON.stringify(data.user.players));
       localStorage.setItem("powercards", JSON.stringify(data.user.powercards));
-      localStorage.setItem('leaderboard', JSON.stringify([]));
       navigate("/dashboard");
     } else {
       alert(data.message);

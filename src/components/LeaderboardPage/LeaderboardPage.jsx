@@ -1,22 +1,13 @@
 // import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import io from 'socket.io-client';
 import { Navbar } from "../Utils";
 import "./LeaderboardPage.css";
 
-// const teamsData = [
-//   { name: 'Mumbai Indians', points: 20, position: 1 },
-//   { name: 'Chennai Super Kings', points: 18, position: 2 },
-//   { name: 'Delhi Capitals', points: 16, position: 3 },
-//   { name: 'Royal Challengers Bangalore', points: 14, position: 4 },
-//   { name: 'Kolkata Knight Riders', points: 12, position: 5 },
-//   { name: 'Rajasthan Royals', points: 10, position: 6 },
-//   { name: 'Kings XI Punjab', points: 8, position: 7 },
-//   { name: 'Sunrisers Hyderabad', points: 6, position: 8 },
-// ];
-
-const socket = io(`${import.meta.env.VITE_SERVERURL}`);
+const SERVERURL = import.meta.env.VITE_SERVERURL;
+const socket = io(SERVERURL);
 
 const LeaderboardItem = ({ position, name, points }) => (
   <div className="flex items-center justify-between mb-3 min-h-12 text-cent er">
@@ -28,7 +19,7 @@ const LeaderboardItem = ({ position, name, points }) => (
 
 const LeaderboardPage = () => {
   const [username, setUsername] = useState(localStorage.getItem("username") || "");
-  const [teamsData, setTeamsData] = useState(JSON.parse(localStorage.getItem("leaderboard")) || []);
+  const [teamsData, setTeamsData] = useState([]);
   const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const navigate = useNavigate();
@@ -37,6 +28,21 @@ const LeaderboardPage = () => {
     if (!username)
       navigate("/");
   }, [username, navigate]);
+
+  useEffect(() => {
+    async function fetchLeaderboardData() {
+      try {
+        const response = await axios.post(`${SERVERURL}/getLeaderboard`, { slot }, { headers: { "Content-Type": "application/json" } });
+        const leaderboardData =  response.data;
+        setTeamsData(leaderboardData);
+      } catch (err) {
+        console.error(`Error fetching player data for ${slot}: ${err}`);
+        throw err;
+      }
+    }
+    fetchLeaderboardData();
+  }, [slot]);
+
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -52,23 +58,22 @@ const LeaderboardPage = () => {
       setTeamsData(prevTeamsData => {
         console.log(data);
         const teamName = data.payload.teamName;
-
+        const score = data.payload.score;
+        
         // Check if the team already exists in prevTeamsData
         const teamExists = prevTeamsData.find(team => team.name === teamName);
 
         // If the team doesn't exist, add it to the array
         if (!teamExists) {
-          const obj = { name: teamName, points: data.payload.score };
-          console.log(obj);
+          const obj = { teamName: teamName, score: score };
           return [...prevTeamsData, obj];
         }
         else {
           const newArray = prevTeamsData.filter(team => team.name !== teamName);
-          teamExists.points = data.payload.score;
+          teamExists.score = score;
           return [...newArray, teamExists];
         }
       });
-
     });
 
 
@@ -79,10 +84,6 @@ const LeaderboardPage = () => {
     };
   }, [slot]);
 
-  useEffect(() => {
-    localStorage.setItem('leaderboard', JSON.stringify(teamsData));
-  }, [teamsData]);
-
 
   return (
     <div className="flex flex-col h-screen">
@@ -91,9 +92,9 @@ const LeaderboardPage = () => {
         <h2 className="title text-7xl my-16"> LEADERBOARD </h2>
         <div className="flex flex-col flex-grow justify-evenly p-2">
           {
-            teamsData.length > 0 ? (teamsData.sort((a, b) => b.points - a.points)
+            teamsData.length > 0 ? (teamsData.sort((a, b) => b.score - a.score)
               .map(
-                (team, index) => <LeaderboardItem key={team.name} position={index + 1} name={team.name} points={team.points} />
+                (team, index) => <LeaderboardItem key={team.name} position={index + 1} name={team.teamName} points={team.score} />
               )
             ) : <div className="mt-2 text-3xl">Scoreboard will be displayed shortly...</div>
           }
