@@ -33,7 +33,7 @@ const LeaderboardPage = () => {
     async function fetchLeaderboardData() {
       try {
         const response = await axios.post(`${SERVERURL}/getLeaderboard`, { slot }, { headers: { "Content-Type": "application/json" } });
-        const leaderboardData =  response.data;
+        const leaderboardData = response.data;
         setTeamsData(leaderboardData);
       } catch (err) {
         console.error(`Error fetching player data for ${slot}: ${err}`);
@@ -56,22 +56,18 @@ const LeaderboardPage = () => {
 
     socket.on(`scoreUpdate${slot}`, (data) => {
       setTeamsData(prevTeamsData => {
-        console.log(data);
-        const teamName = data.payload.teamName;
-        const score = data.payload.score;
-        
-        // Check if the team already exists in prevTeamsData
-        const teamExists = prevTeamsData.find(team => team.name === teamName);
+        const { teamName, score } = data.payload;
 
-        // If the team doesn't exist, add it to the array
-        if (!teamExists) {
-          const obj = { teamName: teamName, score: score };
-          return [...prevTeamsData, obj];
-        }
-        else {
-          const newArray = prevTeamsData.filter(team => team.name !== teamName);
-          teamExists.score = score;
-          return [...newArray, teamExists];
+        const teamIndex = prevTeamsData.findIndex(team => team.teamName === teamName);
+
+        if (teamIndex === -1) {
+          // If the team doesn't exist, add it to the array
+          return [...prevTeamsData, { teamName: teamName, score }];
+        } else {
+          // If the team exists, update its score
+          return prevTeamsData.map((team, index) =>
+            index === teamIndex ? { ...team, score } : team
+          );
         }
       });
     });
