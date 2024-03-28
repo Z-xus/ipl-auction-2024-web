@@ -39,8 +39,8 @@ const DashboardPage = () => {
   const [team, setTeam] = useState(localStorage.getItem("team") || "");
   const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
   const [budget, setBudget] = useState(localStorage.getItem("budget") || "NaN");
-  const [players, setPlayers] = useState([]);
-  const [powercards, setPowercards] = useState([]);
+  const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")) || []);
+  const [powercards, setPowercards] = useState(JSON.parse(localStorage.getItem("powercards")) || []);
   const [playersData, setPlayersData] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const navigate = useNavigate();

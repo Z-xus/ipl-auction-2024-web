@@ -9,11 +9,8 @@ const CaptaincyPopup = ({ message, onCancel, onConfirm, playerCards, currentCapt
   };
 
   const handleConfirm = () => {
-    if (selectedCard) {
+    if (selectedCard)
       onConfirm(selectedCard); // Pass the selected card data to the onConfirm function
-    } else {
-      console.log("No captain selected.");
-    }
   };
 
   // Filter unique cards based on playerName
