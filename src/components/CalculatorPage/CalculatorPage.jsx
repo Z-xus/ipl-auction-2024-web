@@ -100,7 +100,6 @@ const CalculatorPage = () => {
 
     useEffect(() => {
         socket.on('connect', () => {
-            console.log("connected");
             setIsConnected(true);
         });
 
@@ -108,29 +107,24 @@ const CalculatorPage = () => {
             setIsConnected(false);
         });
 
-        const handlePlayer = (data, action) => {
-            const newPlayerId = data.payload.playerID;
+        const handlePlayer = (data) => {
             const newBudget = data.payload.budget;
-            setPlayers(prevPlayers => {
-                const playerIndex = prevPlayers.indexOf(newPlayerId);
-                if (playerIndex === -1 && action === "add") {
-                    const updatedPlayers = [...prevPlayers, newPlayerId];
-                    localStorage.setItem("players", JSON.stringify(updatedPlayers));
-                    localStorage.setItem("budget", JSON.stringify(newBudget));
-                    return updatedPlayers;
-                }
-                else if (playerIndex !== -1 && action === "delete") {
-                    const updatedPlayers = [...prevPlayers.slice(0, playerIndex), ...prevPlayers.slice(playerIndex + 1)];
-                    localStorage.setItem("players", JSON.stringify(updatedPlayers));
-                    localStorage.setItem("budget", JSON.stringify(newBudget));
-                    return updatedPlayers;
-                }
-                return prevPlayers;
-            });
+            localStorage.setItem("budget", JSON.stringify(newBudget));
         };
 
-        socket.on(`playerAdded${team}${slot}`, data => handlePlayer(data, "add"));
-        socket.on(`playerDeleted${team}${slot}`, data => handlePlayer(data, "delete"));
+        socket.on(`playerAdded${team}${slot}`, data => handlePlayer(data));
+        socket.on(`playerDeleted${team}${slot}`, data => handlePlayer(data));
+
+        const handlePowercard = (data) => {
+            const updatedPowercards = data.payload.powercards;
+            const newBudget = data.payload.budget;
+            localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
+            localStorage.setItem("budget", JSON.stringify(newBudget));
+        };
+
+        socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
+        socket.on(`usePowerCard${team}${slot}`, data => handlePowercard(data));
+
         socket.on(`teamAllocate${username}${slot}`, (data) => {
             const teamData = data.payload;
             localStorage.setItem("team", teamData.teamName);
@@ -166,8 +160,8 @@ const CalculatorPage = () => {
     const getStatProperty = () => {
         if (selectedBox === null || selectedRadioBox === null) return null;
         let prop = "";
-        if (selectedRadioBox === 1) prop += "bat"
-        else if (selectedRadioBox === 2) prop += "bow"
+        if (selectedRadioBox === 1) prop += "bat";
+        else if (selectedRadioBox === 2) prop += "bow";
         prop += "_";
         if (selectedBox === 1) prop += "ppl";
         else if (selectedBox === 2) prop += "mo";
@@ -345,7 +339,7 @@ const CalculatorPage = () => {
             }
         } else {
             console.warn("Invalid property");
-            setErrMessage("Oops.. There's some unexpected issue. Please contact the administrator.")
+            setErrMessage("Oops.. There's some unexpected issue. Please contact the administrator.");
             e.preventDefault();
             return;
         }

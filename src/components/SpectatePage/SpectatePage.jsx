@@ -47,7 +47,6 @@ const SpectatePage = () => {
 
   useEffect(() => {
     socket.on('connect', () => {
-      console.log("connected");
       setIsConnected(true);
     });
 
@@ -55,30 +54,19 @@ const SpectatePage = () => {
       setIsConnected(false);
     });
 
-    const handlePlayer = (data, action) => {
-      const newPlayerId = data.payload.playerID;
+    const handlePlayer = (data) => {
       const newBudget = data.payload.budget;
-      const tempPlayers = JSON.parse(localStorage.getItem("players"));
-      const playerIndex = tempPlayers.indexOf(newPlayerId);
-
-      if (playerIndex === -1 && action === "add") {
-        const updatedPlayers = [...tempPlayers, newPlayerId];
-        localStorage.setItem("players", JSON.stringify(updatedPlayers));
-        localStorage.setItem("budget", JSON.stringify(newBudget));
-      }
-      else if (playerIndex !== -1 && action === "delete") {
-        const updatedPlayers = [...tempPlayers.slice(0, playerIndex), ...tempPlayers.slice(playerIndex + 1)];
-        localStorage.setItem("players", JSON.stringify(updatedPlayers));
-        localStorage.setItem("budget", JSON.stringify(newBudget));
-      }
+      localStorage.setItem("budget", JSON.stringify(newBudget));
     };
 
-    socket.on(`playerAdded${team}${slot}`, data => handlePlayer(data, "add"));
-    socket.on(`playerDeleted${team}${slot}`, data => handlePlayer(data, "delete"));
+    socket.on(`playerAdded${team}${slot}`, data => handlePlayer(data));
+    socket.on(`playerDeleted${team}${slot}`, data => handlePlayer(data));
 
     const handlePowercard = (data) => {
-      const updatedPowercards = data.payload;
+      const updatedPowercards = data.payload.powercards;
+      const newBudget = data.payload.budget;
       localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
+      localStorage.setItem("budget", JSON.stringify(newBudget));
     };
 
     socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
@@ -110,8 +98,10 @@ const SpectatePage = () => {
     socket.on(`playerDeleted${teamName.toUpperCase()}${slot}`, data => handleSpectateTeamPlayer(data, "delete"));
 
     const handleSpectateTeamPowercard = (data) => {
-      const updatedPowercards = data.payload;
+      const updatedPowercards = data.payload.powercards;
+      const newBudget = data.payload.budget;
       setPowercards(updatedPowercards);
+      setBudget(newBudget);
     };
 
     socket.on(`powercardAdded${teamName.toUpperCase()}${slot}`, data => handleSpectateTeamPowercard(data));

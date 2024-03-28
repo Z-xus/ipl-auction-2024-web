@@ -19,8 +19,9 @@ const LeaderboardItem = ({ position, name, points }) => (
 
 const LeaderboardPage = () => {
   const [username, setUsername] = useState(localStorage.getItem("username") || "");
-  const [teamsData, setTeamsData] = useState([]);
+  const [team, setTeam] = useState(localStorage.getItem("team") || "");
   const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
+  const [teamsData, setTeamsData] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const navigate = useNavigate();
 
@@ -46,7 +47,6 @@ const LeaderboardPage = () => {
 
   useEffect(() => {
     socket.on('connect', () => {
-      console.log("connected");
       setIsConnected(true);
     });
 
@@ -72,13 +72,36 @@ const LeaderboardPage = () => {
       });
     });
 
+    const handlePlayer = (data) => {
+      const newBudget = data.payload.budget;
+      localStorage.setItem("budget", JSON.stringify(newBudget));
+    };
+
+    socket.on(`playerAdded${team}${slot}`, data => handlePlayer(data));
+    socket.on(`playerDeleted${team}${slot}`, data => handlePlayer(data));
+
+    const handlePowercard = (data) => {
+      const updatedPowercards = data.payload.powercards;
+      const newBudget = data.payload.budget;
+      localStorage.setItem("powercards", JSON.stringify(updatedPowercards));
+      localStorage.setItem("budget", JSON.stringify(newBudget));
+    };
+
+    socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
+    socket.on(`usePowerCard${team}${slot}`, data => handlePowercard(data));
+
+    socket.on(`teamAllocate${username}${slot}`, (data) => {
+      const teamData = data.payload;
+      localStorage.setItem("team", teamData.teamName);
+      localStorage.setItem("budget", teamData.budget);
+    });
 
     return () => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, [slot]);
+  }, [username, team, slot]);
 
 
   return (
