@@ -224,13 +224,16 @@ const CalculatorPage = () => {
             "legendary": 0
         };
 
-        droppedCards.forEach(card => {
+        playerData.forEach(card => {
             counts[card.type]++;
             if (card.gender === 'female') {
                 counts['women']++;
             }
             if (card.gender === 'legendary') {
                 counts['legendary']++;
+            }
+            if (card.gender === 'underdog') {
+                counts['underdogs']++;
             }
             if (card.flag !== "ind") {
                 counts['foreign']++;
@@ -253,6 +256,7 @@ const CalculatorPage = () => {
         let penalty = 0;
         for (const type in conditions) {
             const { min, max } = conditions[type];
+            console.log(type, min, max, counts[type]);
             const count = counts[type];
             const conditionMet = count >= min && count <= max;
             const minConditionMet = count >= min;
@@ -452,9 +456,10 @@ const CalculatorPage = () => {
 
     const handleSubmit = async () => {
         setShowSubmitPopup(true);
-        const { message, allConditionsMet, penalty } = validatePlayerConditions();
         // Show the conditions board.
         setSubmitMsg(`Your total points are ${points}\nAre you sure you want to submit?`);
+        const { message, allConditionsMet, penalty } = validatePlayerConditions();
+        console.log(penalty);
         try {
             const response = await axios.post(`${SERVERURL}/calculator`, {
                 teamName: team,
