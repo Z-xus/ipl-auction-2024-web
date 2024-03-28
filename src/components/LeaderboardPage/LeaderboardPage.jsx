@@ -27,6 +27,7 @@ const LeaderboardPage = () => {
   const [team, setTeam] = useState(localStorage.getItem("team") || "");
   const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
   const [teamsData, setTeamsData] = useState([]);
+  const [showPage, setShowPage] = useState(false);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const navigate = useNavigate();
 
@@ -34,6 +35,17 @@ const LeaderboardPage = () => {
     if (!username)
       navigate("/");
   }, [username, navigate]);
+
+  useEffect(() => {
+    async function checkScoreSubmit() {
+      const response = await axios.post(`${SERVERURL}/checkScoreSubmit`, { teamName: team, slot: slot }, { headers: { "Content-Type": "application/json" } });
+      const isScoreSubmitted = response.data.isSubmitted;
+      if (!isScoreSubmitted)
+        setShowPage(true);
+    }
+
+    checkScoreSubmit();
+  }, [slot, team, navigate]);
 
   useEffect(() => {
     async function fetchLeaderboardData() {
@@ -116,19 +128,23 @@ const LeaderboardPage = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <Navbar style={{ backdropFilter: 'blur(12.5px)' }} />
-      <div className="flex flex-col items-center flex-grow overflow-y-auto custom-scrollbar" style={{ backdropFilter: 'blur(12.5px)' }}>
-        <h2 className="title text-7xl my-16"> LEADERBOARD </h2>
-        <div className="flex flex-col flex-grow justify-evenly p-2">
-          {
-            teamsData.length > 0 ? (teamsData.sort((a, b) => b.score - a.score)
-              .map(
-                (team, index) => <LeaderboardItem key={team.name} position={index + 1} name={team.teamName} points={team.score} />
+      {showPage ? <>
+        <Navbar style={{ backdropFilter: 'blur(12.5px)' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-2 text-3xl">Scoreboard will be displayed shortly...</div>
+      </> : <>
+        <div className="flex flex-col items-center flex-grow overflow-y-auto custom-scrollbar" style={{ backdropFilter: 'blur(12.5px)' }}>
+          <h2 className="title text-7xl my-16"> LEADERBOARD </h2>
+          <div className="flex flex-col flex-grow justify-evenly p-2">
+            {
+              (teamsData.sort((a, b) => b.score - a.score)
+                .map(
+                  (team, index) => <LeaderboardItem key={team.name} position={index + 1} name={team.teamName} points={team.score} />
+                )
               )
-            ) : <div className="mt-2 text-3xl">Scoreboard will be displayed shortly...</div>
-          }
+            }
+          </div>
         </div>
-      </div>
+      </>}
     </div>
   );
 };

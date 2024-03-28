@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
+import axios from 'axios';
 import { Navbar, Card, Powercard, numberConvert, fetchPlayerData } from "../Utils";
 import "./DashboardPage.css";
 
@@ -42,6 +43,7 @@ const DashboardPage = () => {
   const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")) || []);
   const [powercards, setPowercards] = useState(JSON.parse(localStorage.getItem("powercards")) || []);
   const [playersData, setPlayersData] = useState([]);
+  const [showPage, setShowPage] = useState(false);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const navigate = useNavigate();
 
@@ -49,6 +51,19 @@ const DashboardPage = () => {
     if (!username)
       navigate("/");
   }, [username, navigate]);
+
+  useEffect(() => {
+    async function checkScoreSubmit() {
+      const response = await axios.post(`${SERVERURL}/checkScoreSubmit`, { teamName: team, slot: slot }, { headers: { "Content-Type": "application/json" } });
+      const isScoreSubmitted = response.data.isSubmitted;
+      if (isScoreSubmitted)
+        navigate('/leaderboard');
+      else
+        setShowPage(true);
+    }
+
+    checkScoreSubmit();
+  }, [slot, team, navigate]);
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -135,37 +150,39 @@ const DashboardPage = () => {
   }, [players]);
 
   return (
-    <div className="dashboard-container">
-      {/* Navbar */}
-      <nav className="col-span-2">
-        <Navbar />
-      </nav>
+    showPage && <>
+      <div className="dashboard-container">
+        {/* Navbar */}
+        <nav className="col-span-2">
+          <Navbar />
+        </nav>
 
-      {/* Team Data */}
-      <div className="team-container flex-col px-4">
-        {/* Budget Info */}
-        <div className="flex flex-col items-center">
-          <img className="max-h-52 py-6" src={`/images/teamlogo/${team.toLowerCase()}.png`} alt="" />
-          <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
-          <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(budget)}</p>
-          <hr className="w-11/12" />
-        </div>
+        {/* Team Data */}
+        <div className="team-container flex-col px-4">
+          {/* Budget Info */}
+          <div className="flex flex-col items-center">
+            <img className="max-h-52 py-6" src={`/images/teamlogo/${team.toLowerCase()}.png`} alt="" />
+            <p className="budget-text text-2xl leading-[0]">CURRENT BUDGET</p>
+            <p className="budget-text text-[4rem] leading-[6rem]">{numberConvert(budget)}</p>
+            <hr className="w-11/12" />
+          </div>
 
-        {/* Powercard Info */}
-        <div className="flex flex-col items-center">
-          <p className="powercard-text">POWERCARDS</p>
-          <div className="powerupcard-container">
-            {powercards.map(({ name, isUsed, _id }) => (<Powercard key={_id} name={name} isUsed={isUsed} />))}
+          {/* Powercard Info */}
+          <div className="flex flex-col items-center">
+            <p className="powercard-text">POWERCARDS</p>
+            <div className="powerupcard-container">
+              {powercards.map(({ name, isUsed, _id }) => (<Powercard key={_id} name={name} isUsed={isUsed} />))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Team Players */}
-      <div className="overflow-y-auto m-1/12 p-2 custom-scrollbar">
-        <p className='powercard-text text-2xl my-4'> CURRENT TEAM PLAYERS </p>
-        <TeamPlayers players={playersData} />
+        {/* Team Players */}
+        <div className="overflow-y-auto m-1/12 p-2 custom-scrollbar">
+          <p className='powercard-text text-2xl my-4'> CURRENT TEAM PLAYERS </p>
+          <TeamPlayers players={playersData} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

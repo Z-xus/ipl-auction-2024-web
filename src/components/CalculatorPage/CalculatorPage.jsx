@@ -65,6 +65,7 @@ const CalculatorPage = () => {
     const [players, setPlayers] = useState(JSON.parse(localStorage.getItem("players")) || []);
     const [slot, setSlot] = useState(localStorage.getItem("slot") || 0);
     const [team, setTeam] = useState(localStorage.getItem("team") || "");
+    const [showPage, setShowPage] = useState(false);
     const [isConnected, setIsConnected] = useState(socket.connected);
 
     const navigate = useNavigate();
@@ -74,6 +75,18 @@ const CalculatorPage = () => {
             navigate("/");
     }, [username, navigate]);
 
+    useEffect(() => {
+        async function checkScoreSubmit() {
+            const response = await axios.post(`${SERVERURL}/checkScoreSubmit`, { teamName: team, slot: slot }, { headers: { "Content-Type": "application/json" } });
+            const isScoreSubmitted = response.data.isSubmitted;
+            if (isScoreSubmitted)
+                navigate('/leaderboard');
+            else
+                setShowPage(true);
+        }
+
+        checkScoreSubmit();
+    }, [slot, team, navigate]);
 
     useEffect(() => {
         (async () => {
@@ -471,8 +484,10 @@ const CalculatorPage = () => {
             });
             // console.log("Username: " + username, " Team: " + team, " Slot: " + slot, " Points: " + points, " Penalty: " + penalty);
             // TODO: Display these in popups.
-            if (response.data.message === "Score updated successfully")
+            if (response.data.message === "Score updated successfully") {
                 console.log("Score updated successfully");
+                navigate('/leaderboard');
+            }
             else
                 console.log("There was an error updating score.");
         } catch (error) {
@@ -563,119 +578,121 @@ const CalculatorPage = () => {
 
 
     return (
-        <div className="calculator">
-            <Navbar />
-            {
-                // TODO: Refine the UI/UX.
-            }
-            {showErrPopup && <Popup message={errMessage} isOK={true} onCancel={null} onConfirm={handleCloseErrPopup} />}
+        showPage && <>
+            <div className="calculator">
+                <Navbar />
+                {
+                    // TODO: Refine the UI/UX.
+                }
+                {showErrPopup && <Popup message={errMessage} isOK={true} onCancel={null} onConfirm={handleCloseErrPopup} />}
 
-            {showSubmitPopup && <Popup message={submitMsg} isOK={false} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
+                {showSubmitPopup && <Popup message={submitMsg} isOK={false} onCancel={handleClosePopup} onConfirm={handleClosePopup} />}
 
-            {showConditionsBoard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
+                {showConditionsBoard && <ConditionsBoard message={conditionsBoardMessage} onCancel={handleCloseConditionsboard} onConfirm={handleCloseConditionsboard} />}
 
-            {showCapPopup && <CaptaincyPopup playerCards={droppedCards} currentCaptain={captain} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
+                {showCapPopup && <CaptaincyPopup playerCards={droppedCards} currentCaptain={captain} onCancel={handleCloseCapPopup} onConfirm={handleConfirmCaptain} />}
 
-            <div className="main-title flex justify-between px-4 py-4 items-center">
-                <div className="total-points text-2xl inline py-4 px-6">
+                <div className="main-title flex justify-between px-4 py-4 items-center">
+                    <div className="total-points text-2xl inline py-4 px-6">
+                        {
+                            // PERF: react-flip-numbers library?
+                        }
+                        Total Points: {points}
+                    </div>
                     {
-                        // PERF: react-flip-numbers library?
+                        // NOTE: not important
+                        // TODO: What to do with this?..
+                        // <h1 className="font-bold uppercase underline text-4xl inline">Calculator</h1>
                     }
-                    Total Points: {points}
+                    <div className="btns flex flex-row gap-3">
+                        <RadioBox id={1} label="Batting" isSelected={selectedRadioBox === 1} onSelect={handleRadioBoxSelect} />
+                        <RadioBox id={2} label="Bowling" isSelected={selectedRadioBox === 2} onSelect={handleRadioBoxSelect} />
+                        <Button text={"Captain"} event={handleCaptain} />
+                        <Button text={"Clear"} event={handleClearCards} />
+                        <Button text={"Submit"} event={handleSubmit} />
+                    </div>
                 </div>
-                {
-                    // NOTE: not important
-                    // TODO: What to do with this?..
-                    // <h1 className="font-bold uppercase underline text-4xl inline">Calculator</h1>
-                }
-                <div className="btns flex flex-row gap-3">
-                    <RadioBox id={1} label="Batting" isSelected={selectedRadioBox === 1} onSelect={handleRadioBoxSelect} />
-                    <RadioBox id={2} label="Bowling" isSelected={selectedRadioBox === 2} onSelect={handleRadioBoxSelect} />
-                    <Button text={"Captain"} event={handleCaptain} />
-                    <Button text={"Clear"} event={handleClearCards} />
-                    <Button text={"Submit"} event={handleSubmit} />
+                <div className="drag-in-container flex justify-evenly">
+                    <Box
+                        id={1}
+                        label={`Power Play ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
+                        isSelected={selectedBox === 1}
+                        onSelect={handleBoxSelect}
+                    />
+                    <Box
+                        id={2}
+                        label={`Mid Over ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
+                        isSelected={selectedBox === 2}
+                        onSelect={handleBoxSelect}
+                    />
+                    <Box
+                        id={3}
+                        label={`Death Over ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
+                        isSelected={selectedBox === 3}
+                        onSelect={handleBoxSelect}
+                    />
+
                 </div>
-            </div>
-            <div className="drag-in-container flex justify-evenly">
-                <Box
-                    id={1}
-                    label={`Power Play ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
-                    isSelected={selectedBox === 1}
-                    onSelect={handleBoxSelect}
-                />
-                <Box
-                    id={2}
-                    label={`Mid Over ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
-                    isSelected={selectedBox === 2}
-                    onSelect={handleBoxSelect}
-                />
-                <Box
-                    id={3}
-                    label={`Death Over ${selectedRadioBox === 1 ? "Batting" : selectedRadioBox === 2 ? "Bowling" : selectedRadioBox === null ? "Bat/Bowl" : ""}`}
-                    isSelected={selectedBox === 3}
-                    onSelect={handleBoxSelect}
-                />
+                <div className="card-placeholder h-[11.7rem] flex justify-center items-center my-7"
+                    onDrop={handleOnDrop} onDragOver={handleDragOver}
+                >
+                    {
+                        // NOTE: not important
+                        // FIXME: not working (sometimes) when there is 0 elements in the array
+                        // no cards dropped yet or no buttons pressed yet.
+                        (categoryArrayMapping.find(item => item.category === getStatProperty()) &&
+                            categoryArrayMapping.find(item => item.category === getStatProperty()).array.length === 0) ||
+                        getStatProperty() === null && (
+                            <span className="placeholder-text text-xl mx-4 flex">Drop your cards here!</span>
+                        )
+                    }
 
+                    {
+                        getStatProperty() === 'bat_ppl' && batPplCards.length > 0 && (
+                            batPplCards.map((data, index) => (
+                                <Card key={index} data={data} />
+                            ))
+                        )
+                    }
+                    {
+                        getStatProperty() === 'bat_mo' && batMoCards.length > 0 && (
+                            batMoCards.map((data, index) => (
+                                <Card key={index} data={data} />
+                            ))
+                        )
+                    }
+                    {
+                        getStatProperty() === 'bat_dth' && batDthCards.length > 0 && (
+                            batDthCards.map((data, index) => (
+                                <Card key={index} data={data} />
+                            ))
+                        )
+                    }
+                    {
+                        getStatProperty() === 'bow_ppl' && bowPplCards.length > 0 && (
+                            bowPplCards.map((data, index) => (
+                                <Card key={index} data={data} />
+                            ))
+                        )
+                    }
+                    {
+                        getStatProperty() === 'bow_mo' && bowMoCards.length > 0 && (
+                            bowMoCards.map((data, index) => (
+                                <Card key={index} data={data} />
+                            ))
+                        )
+                    }
+                    {
+                        getStatProperty() === 'bow_dth' && bowDthCards.length > 0 && (
+                            bowDthCards.map((data, index) => (
+                                <Card key={index} data={data} />
+                            ))
+                        )
+                    }
+                </div>
+                <CardContainer cardData={availablePlayers} />
             </div>
-            <div className="card-placeholder h-[11.7rem] flex justify-center items-center my-7"
-                onDrop={handleOnDrop} onDragOver={handleDragOver}
-            >
-                {
-                    // NOTE: not important
-                    // FIXME: not working (sometimes) when there is 0 elements in the array
-                    // no cards dropped yet or no buttons pressed yet.
-                    (categoryArrayMapping.find(item => item.category === getStatProperty()) &&
-                        categoryArrayMapping.find(item => item.category === getStatProperty()).array.length === 0) ||
-                    getStatProperty() === null && (
-                        <span className="placeholder-text text-xl mx-4 flex">Drop your cards here!</span>
-                    )
-                }
-
-                {
-                    getStatProperty() === 'bat_ppl' && batPplCards.length > 0 && (
-                        batPplCards.map((data, index) => (
-                            <Card key={index} data={data} />
-                        ))
-                    )
-                }
-                {
-                    getStatProperty() === 'bat_mo' && batMoCards.length > 0 && (
-                        batMoCards.map((data, index) => (
-                            <Card key={index} data={data} />
-                        ))
-                    )
-                }
-                {
-                    getStatProperty() === 'bat_dth' && batDthCards.length > 0 && (
-                        batDthCards.map((data, index) => (
-                            <Card key={index} data={data} />
-                        ))
-                    )
-                }
-                {
-                    getStatProperty() === 'bow_ppl' && bowPplCards.length > 0 && (
-                        bowPplCards.map((data, index) => (
-                            <Card key={index} data={data} />
-                        ))
-                    )
-                }
-                {
-                    getStatProperty() === 'bow_mo' && bowMoCards.length > 0 && (
-                        bowMoCards.map((data, index) => (
-                            <Card key={index} data={data} />
-                        ))
-                    )
-                }
-                {
-                    getStatProperty() === 'bow_dth' && bowDthCards.length > 0 && (
-                        bowDthCards.map((data, index) => (
-                            <Card key={index} data={data} />
-                        ))
-                    )
-                }
-            </div>
-            <CardContainer cardData={availablePlayers} />
-        </div>
+        </>
     );
 };
 export default CalculatorPage;
