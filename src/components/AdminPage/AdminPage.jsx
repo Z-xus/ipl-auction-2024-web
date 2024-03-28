@@ -6,6 +6,8 @@ import DeletePlayerForm from './DeletePlayer';
 import AddPowercardForm from './AddPowercard';
 import DeletePowercardForm from './DeletePowercard';
 import AllocateTeamForm from './AllocateTeam';
+import ResetBudget from './ResetBudget';
+import ResetSlot from './ResetSlot';
 
 const ADMINS = import.meta.env.VITE_ADMINS.split(' ');
 
@@ -29,6 +31,8 @@ const AdminPage = () => {
         <AddPowercardForm />
         <DeletePowercardForm />
         <AllocateTeamForm />
+        <ResetBudget />
+        <ResetSlot />
       </div>
       }
     </>
