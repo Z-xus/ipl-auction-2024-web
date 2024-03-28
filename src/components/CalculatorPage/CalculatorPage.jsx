@@ -402,7 +402,7 @@ const CalculatorPage = () => {
 
             prevDroppedCards.forEach((player, index) => {
                 // OVERALL POINTS
-                overall_points += player.overall;
+
                 // CHEMISTRY POINTS
                 for (let i = index + 1; i < prevDroppedCards.length; i++) {
                     let sameChemistry = player.playerChemistry === prevDroppedCards[i].playerChemistry;
@@ -418,6 +418,8 @@ const CalculatorPage = () => {
                     captaincy_points += player.captaincyRating;
                 }
             });
+
+            playerData.forEach(player => { overall_points += player.overall; });
 
             total_points = overall_points + conditional_points + chemistry_points + underdog_points + captaincy_points;
             console.log("Total Points " + total_points + " Overall Points: " + overall_points + " Conditional Points: " + conditional_points + " Chemistry Points: " + chemistry_points + " Underdog Points: " + underdog_points + " Captaincy Points: " + captaincy_points);
@@ -536,9 +538,9 @@ const CalculatorPage = () => {
             }
         });
 
+        // OVERALL POINTS
+        playerData.forEach(player => { overall_points += player.overall; });
         droppedCards.forEach((player, index) => {
-            // OVERALL POINTS
-            overall_points += player.overall;
             // CHEMISTRY POINTS
             for (let i = index + 1; i < droppedCards.length; i++) {
                 let sameChemistry = player.playerChemistry === droppedCards[i].playerChemistry;
