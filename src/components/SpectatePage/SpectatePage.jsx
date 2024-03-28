@@ -72,6 +72,17 @@ const SpectatePage = () => {
     socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
     socket.on(`usePowerCard${team}${slot}`, data => handlePowercard(data));
 
+    socket.on(`resetBudget${team}${slot}`, (data) => {
+      const newBudget = data.payload.budget;
+      localStorage.setItem("budget", newBudget);
+    });
+
+    socket.on(`teamAllocate${username}${slot}`, (data) => {
+      const teamData = data.payload;
+      localStorage.setItem("team", teamData.teamName);
+      localStorage.setItem("budget", teamData.budget);
+    });
+
     const handleSpectateTeamPlayer = (data, action) => {
       const newPlayerId = data.payload.playerID;
       const newBudget = data.payload.budget;
@@ -107,10 +118,9 @@ const SpectatePage = () => {
     socket.on(`powercardAdded${teamName.toUpperCase()}${slot}`, data => handleSpectateTeamPowercard(data));
     socket.on(`usePowerCard${teamName.toUpperCase()}${slot}`, data => handleSpectateTeamPowercard(data));
 
-    socket.on(`teamAllocate${username}${slot}`, (data) => {
-      const teamData = data.payload;
-      localStorage.setItem("team", teamData.teamName);
-      localStorage.setItem("budget", teamData.budget);
+    socket.on(`resetBudget${teamName}${slot}`, (data) => {
+      const newBudget = data.payload.budget;
+      setBudget(newBudget);
     });
 
     return () => {

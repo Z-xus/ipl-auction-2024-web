@@ -100,6 +100,12 @@ const DashboardPage = () => {
     socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
     socket.on(`usePowerCard${team}${slot}`, data => handlePowercard(data));
 
+    socket.on(`resetBudget${team}${slot}`, (data) => {
+      const newBudget = data.payload.budget;
+      setBudget(newBudget);
+      localStorage.setItem("budget", newBudget);
+    });
+
     socket.on(`teamAllocate${username}${slot}`, (data) => {
       const teamData = data.payload;
       setTeam(teamData.teamName);
@@ -120,8 +126,8 @@ const DashboardPage = () => {
       try {
         const resolvedPlayers = await Promise.all(players.map(playerID => fetchPlayerData(SERVERURL, playerID)));
         setPlayersData(resolvedPlayers);
-      } catch (error) {
-        console.error('Error fetching player data:', error);
+      } catch (err) {
+        console.error('Error fetching player data: ', err);
       }
     };
 

@@ -90,6 +90,11 @@ const LeaderboardPage = () => {
     socket.on(`powercardAdded${team}${slot}`, data => handlePowercard(data));
     socket.on(`usePowerCard${team}${slot}`, data => handlePowercard(data));
 
+    socket.on(`resetBudget${team}${slot}`, (data) => {
+      const newBudget = data.payload.budget;
+      localStorage.setItem("budget", newBudget);
+    });
+    
     socket.on(`teamAllocate${username}${slot}`, (data) => {
       const teamData = data.payload;
       localStorage.setItem("team", teamData.teamName);
