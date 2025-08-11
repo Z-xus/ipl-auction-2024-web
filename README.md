@@ -9,6 +9,20 @@ This repository contains the frontend part of the Ipl Auction website for Colleg
 - After all biddings are completed, the player then strategically arranges their cards according to their stats for maximum score. 
 - User with highest score wins.
 
+
+## Preview
+
+_All screenshots below are for demonstration purposes only and contain only demo data._
+
+| Login Screen | Auction Dashboard |
+|--------------|-------------------|
+| ![Login Screen](assets/2025-08-11__22-32-25.png) | ![Auction Dashboard](assets/2025-08-11__22-32-51.png) |
+
+| Player Arrangement (Score Builder) | Leaderboard |
+|------------------------------------|-------------|
+| ![Player Arrangement](assets/2025-08-11__22-33-21.png) | ![Leaderboard](assets/2025-08-11__22-33-29.png) |
+
+
 ## Setup
 Clone the repository to your local machine.
 ```bash
